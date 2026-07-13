@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mundialito 2000 - SUPERLIGAA</title>
+    <title>Mundialito 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -1257,7 +1257,49 @@
             
             if (campo === 'nombre') {
                 jugador.nombre = valor;
-                actualizarEtiquetasCalendario();
+                function actualizarEtiquetasCalendario() {
+            ['A', 'B'].forEach(grupo => {
+                const lista = datosTorneo[grupo];
+                
+                // Mapeo oficial de enfrentamientos para 7 jugadores (Todos contra todos + 1 descansa)
+                const cruces = {
+                    1: [[0,1], [2,3], [4,5]], // Descansa el jugador 6 (Robert / Cesar)
+                    2: [[0,2], [1,4], [3,6]], // Descansa el jugador 5 (Gabo / Nowell)
+                    3: [[0,3], [1,5], [2,6]], // Descansa el jugador 4 (Bronx / Oscar)
+                    4: [[0,4], [2,5], [1,6]], // Descansa el jugador 3 (Fran / Joel)
+                    5: [[0,5], [3,4], [1,2]], // Descansa el jugador 6 (Modificado para evitar repetir con el 5)
+                    6: [[1,2], [3,5], [0,6]], // Descansa el jugador 4
+                    7: [[1,3], [2,4], [0,5]]  // Descansa el jugador 6
+                };
+
+                for(let j = 1; j <= 7; j++) {
+                    for(let m = 1; m <= 3; m++) {
+                        let idxL = cruces[j][m-1][0];
+                        let idxV = cruces[j][m-1][1];
+                        
+                        let jugadorL = lista[idxL];
+                        let jugadorV = lista[idxV];
+
+                        let localNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-l-name`);
+                        let visitNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-v-name`);
+                        
+                        // Si no hay jugador asignado en esa posición del cruce, significa que descansa
+                        if(localNameEl) localNameEl.innerText = jugadorL ? jugadorL.nombre : "DESCANSA";
+                        if(visitNameEl) visitNameEl.innerText = jugadorV ? jugadorV.nombre : "DESCANSA";
+
+                        let localImgContainer = document.getElementById(`img-${grupo}-j${j}-m${m}-l`);
+                        if(localImgContainer) {
+                            localImgContainer.innerHTML = (jugadorL && jugadorL.img) ? `<img src="${jugadorL.img}">` : `<i class="fa-solid fa-flag"></i>`;
+                        }
+
+                        let visitImgContainer = document.getElementById(`img-${grupo}-j${j}-m${m}-v`);
+                        if(visitImgContainer) {
+                            visitImgContainer.innerHTML = (jugadorV && jugadorV.img) ? `<img src="${jugadorV.img}">` : `<i class="fa-solid fa-flag"></i>`;
+                        }
+                    }
+                }
+            });
+        }
                 const wrapperEstrellas = document.getElementById(`estrellas-j-${id}`);
                 if(wrapperEstrellas) wrapperEstrellas.innerHTML = obtenerEstrellasJugador(valor);
             }
