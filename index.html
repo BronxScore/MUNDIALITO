@@ -136,12 +136,37 @@
             padding: 24px 40px;
             border-bottom: 1px solid var(--border-color);
             background-color: var(--bg-sidebar);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .tournament-title {
             font-size: 22px;
             font-weight: 700;
             letter-spacing: -0.5px;
+        }
+
+        /* BOTÓN DE MODO ADMINISTRADOR */
+        .btn-admin-mode {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-admin-mode.active-admin {
+            background-color: var(--score7-green-alpha);
+            border-color: var(--score7-green);
+            color: var(--score7-green);
         }
 
         .content-body {
@@ -250,11 +275,30 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
             position: relative;
             overflow: hidden;
             margin-right: 12px;
             flex-shrink: 0;
+        }
+        
+        /* Oculta el input file si no es admin */
+        .img-circle-selector input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            display: none;
+        }
+
+        body.admin-enabled .img-circle-selector input[type="file"] {
+            display: block;
+        }
+
+        body.admin-enabled .img-circle-selector {
+            cursor: pointer;
         }
 
         .img-circle-selector img {
@@ -266,16 +310,6 @@
         .img-circle-selector i {
             font-size: 11px;
             color: var(--text-muted);
-        }
-
-        .img-circle-selector input[type="file"] {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
         }
 
         .td-jugador-cell {
@@ -293,12 +327,7 @@
             width: 120px;
             padding: 4px 6px;
             border-radius: 4px;
-        }
-
-        .input-nombre:focus {
-            outline: none;
-            border-color: var(--score7-green);
-            background-color: var(--bg-input-focus);
+            pointer-events: none; /* Bloqueado por defecto */
         }
 
         .input-stat {
@@ -310,9 +339,17 @@
             font-size: 14px;
             padding: 4px 2px;
             border-radius: 4px;
+            pointer-events: none; /* Bloqueado por defecto */
         }
 
-        .input-stat:focus {
+        /* Habilitar inputs solo cuando la clase admin esté activa */
+        body.admin-enabled .input-nombre,
+        body.admin-enabled .input-stat {
+            pointer-events: auto;
+        }
+
+        body.admin-enabled .input-nombre:focus,
+        body.admin-enabled .input-stat:focus {
             outline: none;
             border-color: var(--score7-green);
             background-color: var(--bg-input-focus);
@@ -325,8 +362,14 @@
 
         .btn-guardar-container {
             grid-column: span 2;
-            text-align: right;
+            display: none; /* Se oculta a los espectadores */
+            justify-content: flex-end;
+            gap: 12px;
             margin-top: 20px;
+        }
+
+        body.admin-enabled .btn-guardar-container {
+            display: flex; /* Solo visible para el administrador */
         }
 
         .btn-guardar {
@@ -345,6 +388,14 @@
 
         .btn-guardar:hover {
             background-color: var(--score7-green-hover);
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
         }
 
         /* SECCIONES DE JORNADAS Y ELIMINATORIAS */
@@ -425,7 +476,6 @@
             text-align: left;
         }
 
-        /* CONTENEDOR ESTÁNDAR PARA ESCUDOS EN JORNADAS Y BRACKETS */
         .fixture-badge {
             width: 26px;
             height: 26px;
@@ -523,7 +573,7 @@
             align-items: center;
             font-size: 13px;
             font-weight: 500;
-            gap: 10px; /* Separación entre escudo y nombre */
+            gap: 10px;
         }
 
         .view-section {
@@ -573,6 +623,7 @@
             .btn-guardar-container {
                 grid-column: span 1;
                 text-align: center;
+                flex-direction: column;
             }
 
             .btn-guardar {
@@ -614,7 +665,6 @@
     <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
     <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-    <!-- BARRA LATERAL -->
     <div class="sidebar" id="sidebar">
         <div class="brand">
             <i class="fa-solid fa-trophy"></i> SUPERLIGAA
@@ -635,22 +685,24 @@
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <div class="main-content">
         <div class="top-header">
             <div class="tournament-title">Mundialito 2000</div>
+            <!-- BOTÓN CANDADO PARA ACTIVAR EL PANEL DE CONTROL -->
+            <button class="btn-admin-mode" id="btn-candado-admin" onclick="toggleModoAdmin()">
+                <i class="fa-solid fa-lock"></i> <span id="text-candado">Modo Espectador</span>
+            </button>
         </div>
 
         <div class="content-body">
             
-            <!-- PESTAÑAS SUPERIORES -->
             <div class="tabs-header">
                 <div class="tab-btn active-tab" id="tab-grupos-btn" onclick="switchMainView('grupos')">Fase de Grupos</div>
                 <div class="tab-btn" id="tab-jornadas-btn" onclick="switchMainView('jornadas')">Partidos / Jornadas</div>
                 <div class="tab-btn" id="tab-eliminatorio-btn" onclick="switchMainView('eliminatorio')">Cuadro Eliminatorio</div>
             </div>
 
-            <!-- VISTA 1: TABLAS DE POSICIONES -->
+            <!-- VISTA 1: TABLAS -->
             <div id="view-grupos" class="view-section active-view">
                 <div class="groups-grid">
                     <div class="group-card">
@@ -700,12 +752,13 @@
                     </div>
 
                     <div class="btn-guardar-container">
+                        <button class="btn-guardar btn-danger" onclick="reiniciarTorneo()"><i class="fa-solid fa-trash-can"></i> Resetear Todo</button>
                         <button class="btn-guardar" onclick="procesarTablasYCruces()"><i class="fa-solid fa-sync"></i> Procesar y Guardar Cambios</button>
                     </div>
                 </div>
             </div>
 
-            <!-- VISTA 2: PARTIDOS Y JORNADAS -->
+            <!-- VISTA 2: CALENDARIOS -->
             <div id="view-jornadas" class="view-section">
                 <div class="jornadas-layout">
                     <div>
@@ -719,7 +772,7 @@
                 </div>
             </div>
 
-            <!-- VISTA 3: BRACKETS (CON ESCUDOS AGREGADOS) -->
+            <!-- VISTA 3: ELIMINATORIAS -->
             <div id="view-eliminatorio" class="view-section">
                 <div class="bracket-wrapper">
                     <!-- CUARTOS DE FINAL -->
@@ -732,14 +785,14 @@
                                     <div class="fixture-badge" id="c1-t1-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="c1-t1">1º Grupo A</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-c1-t1" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-c1-t1" oninput="guardarYCalcularBrackets()">
                             </div>
                             <div class="match-team-row">
                                 <div class="match-team-info" id="c1-t2-box">
                                     <div class="fixture-badge" id="c1-t2-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="c1-t2">4º Grupo B</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-c1-t2" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-c1-t2" oninput="guardarYCalcularBrackets()">
                             </div>
                         </div>
                         <div class="match-card">
@@ -749,14 +802,14 @@
                                     <div class="fixture-badge" id="c2-t1-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="c2-t1">2º Grupo B</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-c2-t1" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-c2-t1" oninput="guardarYCalcularBrackets()">
                             </div>
                             <div class="match-team-row">
                                 <div class="match-team-info" id="c2-t2-box">
                                     <div class="fixture-badge" id="c2-t2-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="c2-t2">3º Grupo A</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-c2-t2" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-c2-t2" oninput="guardarYCalcularBrackets()">
                             </div>
                         </div>
                         <div class="match-card">
@@ -766,14 +819,14 @@
                                     <div class="fixture-badge" id="c3-t1-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="c3-t1">1º Grupo B</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-c3-t1" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-c3-t1" oninput="guardarYCalcularBrackets()">
                             </div>
                             <div class="match-team-row">
                                 <div class="match-team-info" id="c3-t2-box">
                                     <div class="fixture-badge" id="c3-t2-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="c3-t2">4º Grupo A</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-c3-t2" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-c3-t2" oninput="guardarYCalcularBrackets()">
                             </div>
                         </div>
                         <div class="match-card">
@@ -783,14 +836,14 @@
                                     <div class="fixture-badge" id="c4-t1-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="c4-t1">2º Grupo A</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-c4-t1" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-c4-t1" oninput="guardarYCalcularBrackets()">
                             </div>
                             <div class="match-team-row">
                                 <div class="match-team-info" id="c4-t2-box">
                                     <div class="fixture-badge" id="c4-t2-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="c4-t2">3º Grupo B</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-c4-t2" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-c4-t2" oninput="guardarYCalcularBrackets()">
                             </div>
                         </div>
                     </div>
@@ -805,14 +858,14 @@
                                     <div class="fixture-badge" id="s1-t1-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="s1-t1">Ganador P1</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-s1-t1" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-s1-t1" oninput="guardarYCalcularBrackets()">
                             </div>
                             <div class="match-team-row">
                                 <div class="match-team-info placeholder-text" id="s1-t2-box">
                                     <div class="fixture-badge" id="s1-t2-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="s1-t2">Ganador P2</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-s1-t2" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-s1-t2" oninput="guardarYCalcularBrackets()">
                             </div>
                         </div>
                         <div class="match-card">
@@ -822,14 +875,14 @@
                                     <div class="fixture-badge" id="s2-t1-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="s2-t1">Ganador P3</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-s2-t1" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-s2-t1" oninput="guardarYCalcularBrackets()">
                             </div>
                             <div class="match-team-row">
                                 <div class="match-team-info placeholder-text" id="s2-t2-box">
                                     <div class="fixture-badge" id="s2-t2-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="s2-t2">Ganador P4</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-s2-t2" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-s2-t2" oninput="guardarYCalcularBrackets()">
                             </div>
                         </div>
                     </div>
@@ -844,14 +897,14 @@
                                     <div class="fixture-badge" id="f-t1-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="f-t1">Ganador S1</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-f-t1" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-f-t1" oninput="guardarYCalcularBrackets()">
                             </div>
                             <div class="match-team-row">
                                 <div class="match-team-info placeholder-text" id="f-t2-box">
                                     <div class="fixture-badge" id="f-t2-img"><i class="fa-solid fa-flag"></i></div>
                                     <span id="f-t2">Ganador S2</span>
                                 </div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-f-t2" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-f-t2" oninput="guardarYCalcularBrackets()">
                             </div>
                         </div>
                         <div id="text-campeon" style="margin-top: 20px; text-align: center; color: var(--score7-green); font-weight: 700; font-size: 18px; text-transform: uppercase;"></div>
@@ -863,7 +916,11 @@
     </div>
 
     <script>
-        let datosTorneo = {
+        // CONTRASEÑA DE ADMINISTRADOR (Cámbiala aquí si lo deseas)
+        const CLAVE_SECRETA = "admin123";
+        let isAdmin = false;
+
+        const estructuraLimpia = {
             A: [
                 {id: 1, nombre: "Jugador A1", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
                 {id: 2, nombre: "Jugador A2", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
@@ -884,22 +941,46 @@
             ]
         };
 
-        // Almacén dinámico temporal para saber qué escudo tiene cada celda del Bracket
+        let datosTorneo = JSON.parse(JSON.stringify(estructuraLimpia));
+
         let imagenesBrackets = {
-            "c1-t1": "", "c1-t2": "",
-            "c2-t1": "", "c2-t2": "",
-            "c3-t1": "", "c3-t2": "",
-            "c4-t1": "", "c4-t2": "",
-            "s1-t1": "", "s1-t2": "",
-            "s2-t1": "", "s2-t2": "",
+            "c1-t1": "", "c1-t2": "", "c2-t1": "", "c2-t2": "",
+            "c3-t1": "", "c3-t2": "", "c4-t1": "", "c4-t2": "",
+            "s1-t1": "", "s1-t2": "", "s2-t1": "", "s2-t2": "",
             "f-t1": "", "f-t2": ""
         };
+
+        // FUNCIÓN DE SEGURIDAD: Alterna entre Modo Espectador y Admin
+        function toggleModoAdmin() {
+            if (!isAdmin) {
+                let intento = prompt("Introduce la contraseña de administrador para editar:");
+                if (intento === CLAVE_SECRETA) {
+                    isAdmin = true;
+                    document.body.classList.add("admin-enabled");
+                    document.getElementById("btn-candado-admin").classList.add("active-admin");
+                    document.getElementById("btn-candado-admin").innerHTML = `<i class="fa-solid fa-lock-open"></i> Modo Admin`;
+                } else {
+                    alert("Contraseña incorrecta. Acceso denegado.");
+                }
+            } else {
+                // Cerrar sesión de administrador
+                isAdmin = false;
+                document.body.classList.remove("admin-enabled");
+                document.getElementById("btn-candado-admin").classList.remove("active-admin");
+                document.getElementById("btn-candado-admin").innerHTML = `<i class="fa-solid fa-lock"></i> Modo Espectador`;
+            }
+        }
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
             sidebar.classList.toggle('open');
             overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+        }
+
+        function persistirEnLocalStorage() {
+            localStorage.setItem('superligaa_datosTorneo', JSON.stringify(datosTorneo));
+            localStorage.setItem('superligaa_imagenesBrackets', JSON.stringify(imagenesBrackets));
         }
 
         function renderizarTablas() {
@@ -953,6 +1034,7 @@
             if (campo === 'nombre') {
                 actualizarEtiquetasCalendario();
             }
+            persistirEnLocalStorage();
         }
 
         function generarCalendariosHTML() {
@@ -966,6 +1048,9 @@
                     
                     let matchesHTML = '';
                     for (let m = 1; m <= 3; m++) {
+                        let localInputId = `input-${grupo}-j${j}-m${m}-l`;
+                        let visitInputId = `input-${grupo}-j${j}-m${m}-v`;
+
                         matchesHTML += `
                             <div class="fixture-match-row">
                                 <div class="fixture-team team-local">
@@ -975,9 +1060,9 @@
                                     </div>
                                 </div>
                                 <div class="fixture-score-inputs">
-                                    <input type="number" class="input-stat" placeholder="-" id="input-${grupo}-j${j}-m${m}-l">
+                                    <input type="number" class="input-stat" placeholder="-" id="${localInputId}" oninput="guardarScoreCalendario('${localInputId}')">
                                     <span>vs</span>
-                                    <input type="number" class="input-stat" placeholder="-" id="input-${grupo}-j${j}-m${m}-v">
+                                    <input type="number" class="input-stat" placeholder="-" id="${visitInputId}" oninput="guardarScoreCalendario('${visitInputId}')">
                                 </div>
                                 <div class="fixture-team team-visitante">
                                     <div class="fixture-badge" id="img-${grupo}-j${j}-m${m}-v">
@@ -999,6 +1084,31 @@
                 }
             });
             actualizarEtiquetasCalendario();
+            recuperarScoresCalendario();
+        }
+
+        function guardarScoreCalendario(idInput) {
+            let el = document.getElementById(idInput);
+            if(el) {
+                localStorage.setItem(`superligaa_cal_${idInput}`, el.value);
+            }
+        }
+
+        function recuperarScoresCalendario() {
+            ['A', 'B'].forEach(grupo => {
+                for (let j = 1; j <= 7; j++) {
+                    for (let m = 1; m <= 3; m++) {
+                        let idL = `input-${grupo}-j${j}-m${m}-l`;
+                        let idV = `input-${grupo}-j${j}-m${m}-v`;
+                        
+                        let valL = localStorage.getItem(`superligaa_cal_${idL}`);
+                        let valV = localStorage.getItem(`superligaa_cal_${idV}`);
+                        
+                        if(valL !== null) document.getElementById(idL).value = valL;
+                        if(valV !== null) document.getElementById(idV).value = valV;
+                    }
+                }
+            });
         }
 
         function actualizarEtiquetasCalendario() {
@@ -1030,20 +1140,12 @@
 
                         let localImgContainer = document.getElementById(`img-${grupo}-j${j}-m${m}-l`);
                         if(localImgContainer) {
-                            if(jugadorL && jugadorL.img) {
-                                localImgContainer.innerHTML = `<img src="${jugadorL.img}">`;
-                            } else {
-                                localImgContainer.innerHTML = `<i class="fa-solid fa-flag"></i>`;
-                            }
+                            localImgContainer.innerHTML = (jugadorL && jugadorL.img) ? `<img src="${jugadorL.img}">` : `<i class="fa-solid fa-flag"></i>`;
                         }
 
                         let visitImgContainer = document.getElementById(`img-${grupo}-j${j}-m${m}-v`);
                         if(visitImgContainer) {
-                            if(jugadorV && jugadorV.img) {
-                                visitImgContainer.innerHTML = `<img src="${jugadorV.img}">`;
-                            } else {
-                                visitImgContainer.innerHTML = `<i class="fa-solid fa-flag"></i>`;
-                            }
+                            visitImgContainer.innerHTML = (jugadorV && jugadorV.img) ? `<img src="${jugadorV.img}">` : `<i class="fa-solid fa-flag"></i>`;
                         }
                     }
                 }
@@ -1056,6 +1158,7 @@
                 reader.onload = function(e) {
                     let jugador = datosTorneo[grupo].find(j => j.id === id);
                     jugador.img = e.target.result;
+                    persistirEnLocalStorage();
                     renderizarTablas();
                     actualizarEtiquetasCalendario();
                 }
@@ -1063,7 +1166,6 @@
             }
         }
 
-        // PROCESA LAS POSICIONES ASIGNANDO ESCUDOS ORIGINALES A CUARTOS DE FINAL
         function procesarTablasYCruces() {
             ['A', 'B'].forEach(grupo => {
                 datosTorneo[grupo].sort((a, b) => {
@@ -1073,27 +1175,24 @@
                 });
             });
 
+            persistirEnLocalStorage();
             renderizarTablas();
             actualizarEtiquetasCalendario();
 
-            // Mapeo e Inyección de nombres y escudos a Cuartos
-            configurarCeldaBracket('c1-t1', datosTorneo['A'][0]); // 1ºA
-            configurarCeldaBracket('c1-t2', datosTorneo['B'][3]); // 4ºB
+            configurarCeldaBracket('c1-t1', datosTorneo['A'][0]);
+            configurarCeldaBracket('c1-t2', datosTorneo['B'][3]);
+            configurarCeldaBracket('c2-t1', datosTorneo['B'][1]);
+            configurarCeldaBracket('c2-t2', datosTorneo['A'][2]);
+            configurarCeldaBracket('c3-t1', datosTorneo['B'][0]);
+            configurarCeldaBracket('c3-t2', datosTorneo['A'][3]);
+            configurarCeldaBracket('c4-t1', datosTorneo['A'][1]);
+            configurarCeldaBracket('c4-t2', datosTorneo['B'][2]);
 
-            configurarCeldaBracket('c2-t1', datosTorneo['B'][1]); // 2ºB
-            configurarCeldaBracket('c2-t2', datosTorneo['A'][2]); // 3ºA
-
-            configurarCeldaBracket('c3-t1', datosTorneo['B'][0]); // 1ºB
-            configurarCeldaBracket('c3-t2', datosTorneo['A'][3]); // 4ºA
-
-            configurarCeldaBracket('c4-t1', datosTorneo['A'][1]); // 2ºA
-            configurarCeldaBracket('c4-t2', datosTorneo['B'][2]); // 3ºB
-
-            alert("Estructuras guardadas. Posiciones de los grupos ordenadas y cruces listos con escudos.");
+            persistirEnLocalStorage();
+            alert("Estructuras y posiciones guardadas con éxito.");
             calcularBrackets();
         }
 
-        // Helper para inyectar datos en una casilla específica del Bracket
         function configurarCeldaBracket(idFila, jugador) {
             const txtElement = document.getElementById(idFila);
             const imgElement = document.getElementById(idFila + "-img");
@@ -1101,27 +1200,60 @@
             if(jugador) {
                 txtElement.innerText = jugador.nombre;
                 imagenesBrackets[idFila] = jugador.img;
-                if(jugador.img) {
-                    imgElement.innerHTML = `<img src="${jugador.img}">`;
-                } else {
-                    imgElement.innerHTML = `<i class="fa-solid fa-flag"></i>`;
-                }
+                imgElement.innerHTML = jugador.img ? `<img src="${jugador.img}">` : `<i class="fa-solid fa-flag"></i>`;
+                localStorage.setItem(`superligaa_txt_bracket_${idFila}`, jugador.nombre);
             }
         }
 
-        // CALCULO DE LLAVES Y PASO DE ESCUDOS ENTRE RONDAS ELIMINATORIAS
+        function guardarYCalcularBrackets() {
+            const inputsBrackets = [
+                'sc-c1-t1', 'sc-c1-t2', 'sc-c2-t1', 'sc-c2-t2',
+                'sc-c3-t1', 'sc-c3-t2', 'sc-c4-t1', 'sc-c4-t2',
+                'sc-s1-t1', 'sc-s1-t2', 'sc-s2-t1', 'sc-s2-t2',
+                'sc-f-t1', 'sc-f-t2'
+            ];
+            inputsBrackets.forEach(id => {
+                let el = document.getElementById(id);
+                if(el) localStorage.setItem(`superligaa_input_bracket_${id}`, el.value);
+            });
+
+            calcularBrackets();
+            persistirEnLocalStorage();
+        }
+
+        function recuperarInputsYLabelsBrackets() {
+            const inputsBrackets = [
+                'sc-c1-t1', 'sc-c1-t2', 'sc-c2-t1', 'sc-c2-t2',
+                'sc-c3-t1', 'sc-c3-t2', 'sc-c4-t1', 'sc-c4-t2',
+                'sc-s1-t1', 'sc-s1-t2', 'sc-s2-t1', 'sc-s2-t2',
+                'sc-f-t1', 'sc-f-t2'
+            ];
+            inputsBrackets.forEach(id => {
+                let val = localStorage.getItem(`superligaa_input_bracket_${id}`);
+                if(val !== null) document.getElementById(id).value = val;
+            });
+
+            Object.keys(imagenesBrackets).forEach(idFila => {
+                let txtGuardado = localStorage.getItem(`superligaa_txt_bracket_${idFila}`);
+                let txtEl = document.getElementById(idFila);
+                let imgEl = document.getElementById(idFila + "-img");
+
+                if(txtGuardado && txtEl) txtEl.innerText = txtGuardado;
+                if(imgEl) {
+                    imgEl.innerHTML = imagenesBrackets[idFila] ? `<img src="${imagenesBrackets[idFila]}">` : `<i class="fa-solid fa-flag"></i>`;
+                }
+            });
+        }
+
         function calcularBrackets() {
-            // Cuartos -> Semis
             avanzarLlave('c1-t1', 'c1-t2', 'sc-c1-t1', 'sc-c1-t2', 's1-t1', 'Ganador Partido 1');
             avanzarLlave('c2-t1', 'c2-t2', 'sc-c2-t1', 'sc-c2-t2', 's1-t2', 'Ganador Partido 2');
             avanzarLlave('c3-t1', 'c3-t2', 'sc-c3-t1', 'sc-c3-t2', 's2-t1', 'Ganador Partido 3');
             avanzarLlave('c4-t1', 'c4-t2', 'sc-c4-t1', 'sc-c4-t2', 's2-t2', 'Ganador Partido 4');
 
-            // Semis -> Final
             avanzarLlave('s1-t1', 's1-t2', 'sc-s1-t1', 'sc-s1-t2', 'f-t1', 'Ganador S1');
             avanzarLlave('s2-t1', 's2-t2', 'sc-s2-t1', 'sc-s2-t2', 'f-t2', 'Ganador S2');
 
-            // Final -> Campeón
             let campeon = determinarGanador('f-t1', 'f-t2', 'sc-f-t1', 'sc-f-t2');
             const txtCamp = document.getElementById('text-campeon');
             
@@ -1132,7 +1264,6 @@
             }
         }
 
-        // Lógica de avance que mueve tanto el string de nombre como la imagen en caché
         function avanzarLlave(t1Id, t2Id, s1Id, s2Id, destinoId, porDefecto) {
             let resultado = determinarGanador(t1Id, t2Id, s1Id, s2Id);
             const destTxt = document.getElementById(destinoId);
@@ -1141,21 +1272,23 @@
             if (resultado) {
                 destTxt.innerText = resultado.nombre;
                 imagenesBrackets[destinoId] = resultado.img;
-                if(resultado.img) {
-                    destImg.innerHTML = `<img src="${resultado.img}">`;
-                } else {
-                    destImg.innerHTML = `<i class="fa-solid fa-flag"></i>`;
-                }
+                destImg.innerHTML = resultado.img ? `<img src="${resultado.img}">` : `<i class="fa-solid fa-flag"></i>`;
+                localStorage.setItem(`superligaa_txt_bracket_${destinoId}`, resultado.nombre);
             } else {
                 destTxt.innerText = porDefecto;
                 imagenesBrackets[destinoId] = "";
                 destImg.innerHTML = `<i class="fa-solid fa-flag"></i>`;
+                localStorage.setItem(`superligaa_txt_bracket_${destinoId}`, porDefecto);
             }
         }
 
         function determinarGanador(t1Id, t2Id, s1Id, s2Id) {
-            let t1 = document.getElementById(t1Id).innerText;
-            let t2 = document.getElementById(t2Id).innerText;
+            let t1El = document.getElementById(t1Id);
+            let t2El = document.getElementById(t2Id);
+            if(!t1El || !t2El) return null;
+
+            let t1 = t1El.innerText;
+            let t2 = t2El.innerText;
             let s1 = parseInt(document.getElementById(s1Id).value);
             let s2 = parseInt(document.getElementById(s2Id).value);
 
@@ -1164,6 +1297,24 @@
                 if (s2 > s1) return { nombre: t2, img: imagenesBrackets[t2Id] };
             }
             return null;
+        }
+
+        function reiniciarTorneo() {
+            if(confirm("¿Estás completamente seguro de que quieres borrar todos los datos del torneo? Esto no se puede deshacer.")) {
+                localStorage.clear();
+                datosTorneo = JSON.parse(JSON.stringify(estructuraLimpia));
+                imagenesBrackets = {
+                    "c1-t1": "", "c1-t2": "", "c2-t1": "", "c2-t2": "",
+                    "c3-t1": "", "c3-t2": "", "c4-t1": "", "c4-t2": "",
+                    "s1-t1": "", "s1-t2": "", "s2-t1": "", "s2-t2": "",
+                    "f-t1": "", "f-t2": ""
+                };
+                renderizarTablas();
+                generarCalendariosHTML();
+                recuperarInputsYLabelsBrackets();
+                calcularBrackets();
+                alert("Torneo reiniciado correctamente.");
+            }
         }
 
         function switchMainView(viewId) {
@@ -1185,14 +1336,20 @@
             }
 
             const sidebar = document.getElementById('sidebar');
-            if(sidebar.classList.contains('open')) {
-                toggleSidebar();
-            }
+            if(sidebar.classList.contains('open')) toggleSidebar();
         }
 
         window.onload = function() {
+            let memoriaDatos = localStorage.getItem('superligaa_datosTorneo');
+            let memoriaImagenes = localStorage.getItem('superligaa_imagenesBrackets');
+
+            if(memoriaDatos) datosTorneo = JSON.parse(memoriaDatos);
+            if(memoriaImagenes) imagenesBrackets = JSON.parse(memoriaImagenes);
+
             renderizarTablas();
             generarCalendariosHTML();
+            recuperarInputsYLabelsBrackets();
+            calcularBrackets();
         };
     </script>
 </body>
