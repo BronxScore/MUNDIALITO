@@ -212,7 +212,7 @@
         .tabla-grupos {
             width: 100%;
             border-collapse: collapse;
-            min-width: 500px; /* Evita que las columnas colapsen en pantallas chicas */
+            min-width: 500px;
         }
 
         .tabla-grupos th {
@@ -353,6 +353,78 @@
             background-color: var(--score7-green-hover);
         }
 
+        /* INTERFAZ DE JORNADAS / CALENDARIO (ESTILO SCORE7) */
+        .fixtures-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .jornada-block {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .jornada-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--score7-green);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .matches-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .fixture-match-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background-color: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .fixture-team {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .fixture-team.team-local {
+            text-align: right;
+            padding-right: 15px;
+        }
+
+        .fixture-team.team-visitante {
+            text-align: left;
+            padding-left: 15px;
+        }
+
+        .fixture-score-inputs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--bg-body);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .fixture-score-inputs span {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
         /* INTERFAZ ELIMINATORIA (BRACKETS) */
         .bracket-wrapper {
             display: grid;
@@ -426,10 +498,10 @@
             font-style: italic;
         }
 
-        /* 📱 RESPONSIVE DESIGN (REGLAS PARA CELULARES) */
+        /* RESPONSIVE DESIGN */
         @media (max-width: 900px) {
             .menu-toggle {
-                display: block; /* Muestra el botón de menú */
+                display: block;
             }
 
             .sidebar {
@@ -437,16 +509,16 @@
                 top: 0;
                 left: 0;
                 height: 100vh;
-                transform: translateX(-100%); /* Esconde la barra a la izquierda */
+                transform: translateX(-100%);
                 box-shadow: 5px 0 15px rgba(0,0,0,0.5);
             }
 
             .sidebar.open {
-                transform: translateX(0); /* Despliega la barra cuando se abre */
+                transform: translateX(0);
             }
 
             .top-header {
-                padding: 20px 20px 20px 70px; /* Deja espacio para el botón flotante */
+                padding: 20px 20px 20px 70px;
             }
 
             .content-body {
@@ -454,7 +526,7 @@
             }
 
             .groups-grid {
-                grid-template-columns: 1fr; /* Pone las tablas una debajo de la otra */
+                grid-template-columns: 1fr;
                 gap: 20px;
             }
 
@@ -464,31 +536,45 @@
             }
 
             .btn-guardar {
-                width: 100%; /* Botón de guardar a pantalla completa en móvil */
+                width: 100%;
             }
 
             .bracket-wrapper {
-                grid-template-columns: 1fr; /* El cuadro eliminatorio fluye hacia abajo */
+                grid-template-columns: 1fr;
                 gap: 30px;
+            }
+
+            .fixture-match-row {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+
+            .fixture-team.team-local, .fixture-team.team-visitante {
+                text-align: center;
+                padding: 0;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- BOTÓN GENTIL PARA DESPLEGAR MENÚ EN MOVIL -->
     <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
     <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
 
     <!-- BARRA LATERAL -->
     <div class="sidebar" id="sidebar">
         <div class="brand">
-            <i class="fa-solid fa-trophy"></i> BronxScore
+            <i class="fa-solid fa-trophy"></i> SUPERLIGAA
         </div>
         <div class="nav-container">
             <div class="nav-section-title">Fase de Grupos</div>
             <div class="nav-item active" id="nav-grupos" onclick="switchMainView('grupos')">
                 <i class="fa-solid fa-list-ol"></i> Tabla de Posiciones
+            </div>
+            <!-- NUEVA OPCIÓN EN LA BARRA DE TAREAS -->
+            <div class="nav-item" id="nav-jornadas" onclick="switchMainView('jornadas')">
+                <i class="fa-solid fa-calendar-days"></i> Partidos y Jornadas
             </div>
 
             <div class="nav-section-title">Fase Eliminatoria</div>
@@ -501,22 +587,21 @@
     <!-- CONTENIDO -->
     <div class="main-content">
         <div class="top-header">
-            <div class="tournament-title">Mundialito 2026</div>
+            <div class="tournament-title">Mundialito 2000</div>
         </div>
 
         <div class="content-body">
             
-            <!-- PESTAÑAS -->
+            <!-- PESTAÑAS SUPERIORES -->
             <div class="tabs-header">
                 <div class="tab-btn active-tab" id="tab-grupos-btn" onclick="switchMainView('grupos')">Fase de Grupos</div>
+                <div class="tab-btn" id="tab-jornadas-btn" onclick="switchMainView('jornadas')">Partidos / Jornadas</div>
                 <div class="tab-btn" id="tab-eliminatorio-btn" onclick="switchMainView('eliminatorio')">Cuadro Eliminatorio</div>
             </div>
 
-            <!-- TABLAS DE POSICIONES EDITABLES -->
+            <!-- VISTA 1: TABLAS DE POSICIONES -->
             <div id="view-grupos" class="view-section active-view">
                 <div class="groups-grid">
-                    
-                    <!-- GRUPO A -->
                     <div class="group-card">
                         <div class="group-card-title">Grupo A</div>
                         <div class="table-responsive">
@@ -540,7 +625,6 @@
                         </div>
                     </div>
 
-                    <!-- GRUPO B -->
                     <div class="group-card">
                         <div class="group-card-title">Grupo B</div>
                         <div class="table-responsive">
@@ -570,14 +654,69 @@
                 </div>
             </div>
 
-            <!-- CUADRO ELIMINATORIO DINÁMICO -->
+            <!-- NUEVA VISTA 2: PARTIDOS Y JORNADAS DE GRUPO -->
+            <div id="view-jornadas" class="view-section">
+                <div class="fixtures-container">
+                    
+                    <!-- JORNADA 1 -->
+                    <div class="jornada-block">
+                        <div class="jornada-header">Jornada 1</div>
+                        <div class="matches-list">
+                            <div class="fixture-match-row">
+                                <div class="fixture-team team-local" id="j1-m1-l">Jugador 1</div>
+                                <div class="fixture-score-inputs">
+                                    <input type="number" class="input-stat" placeholder="-" id="sc-j1-m1-l">
+                                    <span>vs</span>
+                                    <input type="number" class="input-stat" placeholder="-" id="sc-j1-m1-v">
+                                </div>
+                                <div class="fixture-team team-visitante" id="j1-m1-v">Jugador 2</div>
+                            </div>
+                            <div class="fixture-match-row">
+                                <div class="fixture-team team-local" id="j1-m2-l">Jugador 3</div>
+                                <div class="fixture-score-inputs">
+                                    <input type="number" class="input-stat" placeholder="-" id="sc-j1-m2-l">
+                                    <span>vs</span>
+                                    <input type="number" class="input-stat" placeholder="-" id="sc-j1-m2-v">
+                                </div>
+                                <div class="fixture-team team-visitante" id="j1-m2-v">Jugador 4</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- JORNADA 2 -->
+                    <div class="jornada-block">
+                        <div class="jornada-header">Jornada 2</div>
+                        <div class="matches-list">
+                            <div class="fixture-match-row">
+                                <div class="fixture-team team-local" id="j2-m1-l">Jugador 1</div>
+                                <div class="fixture-score-inputs">
+                                    <input type="number" class="input-stat" placeholder="-" id="sc-j2-m1-l">
+                                    <span>vs</span>
+                                    <input type="number" class="input-stat" placeholder="-" id="sc-j2-m1-v">
+                                </div>
+                                <div class="fixture-team team-visitante" id="j2-m1-v">Jugador 3</div>
+                            </div>
+                            <div class="fixture-match-row">
+                                <div class="fixture-team team-local" id="j2-m2-l">Jugador 2</div>
+                                <div class="fixture-score-inputs">
+                                    <input type="number" class="input-stat" placeholder="-" id="sc-j2-m2-l">
+                                    <span>vs</span>
+                                    <input type="number" class="input-stat" placeholder="-" id="sc-j2-m2-v">
+                                </div>
+                                <div class="fixture-team team-visitante" id="j2-m2-v">Jugador 4</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VISTA 3: BRACKETS (CUADRO ELIMINATORIO) -->
             <div id="view-eliminatorio" class="view-section">
                 <div class="bracket-wrapper">
-                    
                     <!-- CUARTOS DE FINAL -->
                     <div class="bracket-column">
                         <div class="bracket-column-title">Cuartos de Final</div>
-                        
                         <div class="match-card">
                             <div class="match-header">Partido 1</div>
                             <div class="match-team-row">
@@ -589,7 +728,6 @@
                                 <input type="number" class="input-stat" placeholder="0" id="sc-c1-t2" oninput="calcularBrackets()">
                             </div>
                         </div>
-
                         <div class="match-card">
                             <div class="match-header">Partido 2</div>
                             <div class="match-team-row">
@@ -601,7 +739,6 @@
                                 <input type="number" class="input-stat" placeholder="0" id="sc-c2-t2" oninput="calcularBrackets()">
                             </div>
                         </div>
-
                         <div class="match-card">
                             <div class="match-header">Partido 3</div>
                             <div class="match-team-row">
@@ -613,7 +750,6 @@
                                 <input type="number" class="input-stat" placeholder="0" id="sc-c3-t2" oninput="calcularBrackets()">
                             </div>
                         </div>
-
                         <div class="match-card">
                             <div class="match-header">Partido 4</div>
                             <div class="match-team-row">
@@ -630,7 +766,6 @@
                     <!-- SEMIFINALES -->
                     <div class="bracket-column">
                         <div class="bracket-column-title">Semifinales</div>
-                        
                         <div class="match-card">
                             <div class="match-header">Semifinal 1</div>
                             <div class="match-team-row">
@@ -639,10 +774,9 @@
                             </div>
                             <div class="match-team-row">
                                 <div class="match-team-info placeholder-text" id="s1-t2">Ganador P2</div>
-                                <input type="number" class="input-stat" placeholder="0" id="sc-s1-t2" oninput="calcularBrackets()">
+                                <input type="number" class="input-stat" placeholder="0" id="sc-s1-t2" oninput="brackets()">
                             </div>
                         </div>
-
                         <div class="match-card">
                             <div class="match-header">Semifinal 2</div>
                             <div class="match-team-row">
@@ -659,7 +793,6 @@
                     <!-- FINAL -->
                     <div class="bracket-column">
                         <div class="bracket-column-title">Final</div>
-                        
                         <div class="match-card">
                             <div class="match-header">Gran Final</div>
                             <div class="match-team-row">
@@ -671,10 +804,8 @@
                                 <input type="number" class="input-stat" placeholder="0" id="sc-f-t2" oninput="calcularBrackets()">
                             </div>
                         </div>
-
                         <div id="text-campeon" style="margin-top: 20px; text-align: center; color: var(--score7-green); font-weight: 700; font-size: 18px; text-transform: uppercase;"></div>
                     </div>
-
                 </div>
             </div>
 
@@ -703,7 +834,6 @@
             ]
         };
 
-        // MECANISMO RESPONSIVO SCRIPT
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
@@ -744,6 +874,7 @@
                     tbody.appendChild(tr);
                 });
             });
+            actualizarNombresCalendario();
         }
 
         function actualizarCampo(input, grupo, id, campo) {
@@ -758,6 +889,20 @@
             if (campo === 'gf' || campo === 'gc') {
                 jugador.gd = jugador.gf - jugador.gc;
             }
+        }
+
+        // SINCRONIZA LOS NOMBRE DE LAS TABLAS AL CALENDARIO DE JORNADAS
+        function actualizarNombresCalendario() {
+            // Jornada 1
+            document.getElementById('j1-m1-l').innerText = datosTorneo['A'][0].nombre;
+            document.getElementById('j1-m1-v').innerText = datosTorneo['A'][1].nombre;
+            document.getElementById('j1-m2-l').innerText = datosTorneo['A'][2].nombre;
+            document.getElementById('j1-m2-v').innerText = datosTorneo['A'][3].nombre;
+            // Jornada 2
+            document.getElementById('j2-m1-l').innerText = datosTorneo['A'][0].nombre;
+            document.getElementById('j2-m1-v').innerText = datosTorneo['A'][2].nombre;
+            document.getElementById('j2-m2-l').innerText = datosTorneo['A'][1].nombre;
+            document.getElementById('j2-m2-v').innerText = datosTorneo['A'][3].nombre;
         }
 
         function cargarBandera(input, grupo, id) {
@@ -850,12 +995,14 @@
             if(viewId === 'grupos') {
                 document.getElementById('nav-grupos').classList.add('active');
                 document.getElementById('tab-grupos-btn').classList.add('active-tab');
+            } else if(viewId === 'jornadas') {
+                document.getElementById('nav-jornadas').classList.add('active');
+                document.getElementById('tab-jornadas-btn').classList.add('active-tab');
             } else if(viewId === 'eliminatorio') {
                 document.getElementById('nav-eliminatorio').classList.add('active');
                 document.getElementById('tab-eliminatorio-btn').classList.add('active-tab');
             }
 
-            // Cerrar menú automáticamente tras elegir sección en celular
             const sidebar = document.getElementById('sidebar');
             if(sidebar.classList.contains('open')) {
                 toggleSidebar();
