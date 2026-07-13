@@ -1349,17 +1349,75 @@ function actualizarCampo(input, grupo, id, campo) {
                         `;
                     }
 
+                    // CONTENEDOR PARA MOSTRAR QUIÉN DESCANSA ABAJO DE LOS PARTIDOS
                     bloqueJornada.innerHTML = `
                         <div class="jornada-header">Jornada ${j}</div>
                         <div class="matches-list">
                             ${matchesHTML}
                         </div>
+                        <div class="jornada-descanso-badge" id="descanso-${grupo}-j${j}" style="text-align: center; font-size: 0.9em; opacity: 0.8; margin-top: 12px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1); color: #00ffcc; font-weight: bold;"></div>
                     `;
                     contenedor.appendChild(bloqueJornada);
                 }
             });
             actualizarEtiquetasCalendario();
             recuperarScoresCalendario();
+        }
+
+        function actualizarEtiquetasCalendario() {
+            ['A', 'B'].forEach(grupo => {
+                const lista = datosTorneo[grupo];
+                
+                const cruces = {
+                    1: [[0,1], [2,3], [4,5]], 
+                    2: [[0,2], [1,4], [3,6]], 
+                    3: [[0,3], [1,5], [2,6]], 
+                    4: [[0,4], [2,5], [1,6]], 
+                    5: [[0,5], [3,4], [1,2]], 
+                    6: [[1,2], [3,5], [0,6]], 
+                    7: [[1,3], [2,4], [0,5]] 
+                };
+
+                for(let j = 1; j <= 7; j++) {
+                    // Detectar matemáticamente quién no juega en esta jornada
+                    let indicesJugando = [];
+                    cruces[j].forEach(par => {
+                        indicesJugando.push(par[0], par[1]);
+                    });
+                    let idxLibre = [0,1,2,3,4,5,6].find(idx => !indicesJugando.includes(idx));
+                    let jugadorLibre = lista[idxLibre];
+
+                    // Colocar el nombre de quien descansa en la etiqueta correspondiente
+                    let descansoEl = document.getElementById(`descanso-${grupo}-j${j}`);
+                    if(descansoEl) {
+                        descansoEl.innerHTML = jugadorLibre ? `<i class="fa-solid fa-bed"></i> Descansa: ${jugadorLibre.nombre}` : "";
+                    }
+
+                    for(let m = 1; m <= 3; m++) {
+                        let idxL = cruces[j][m-1][0];
+                        let idxV = cruces[j][m-1][1];
+                        
+                        let jugadorL = lista[idxL];
+                        let jugadorV = lista[idxV];
+
+                        let localNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-l-name`);
+                        let visitNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-v-name`);
+                        
+                        if(localNameEl) localNameEl.innerText = jugadorL ? jugadorL.nombre : "Jugador";
+                        if(visitNameEl) visitNameEl.innerText = jugadorV ? jugadorV.nombre : "Jugador";
+
+                        let localImgContainer = document.getElementById(`img-${grupo}-j${j}-m${m}-l`);
+                        if(localImgContainer) {
+                            localImgContainer.innerHTML = (jugadorL && jugadorL.img) ? `<img src="${jugadorL.img}">` : `<i class="fa-solid fa-flag"></i>`;
+                        }
+
+                        let visitImgContainer = document.getElementById(`img-${grupo}-j${j}-m${m}-v`);
+                        if(visitImgContainer) {
+                            visitImgContainer.innerHTML = (jugadorV && jugadorV.img) ? `<img src="${jugadorV.img}">` : `<i class="fa-solid fa-flag"></i>`;
+                        }
+                    }
+                }
+            });
         }
 
         function guardarScoreCalendario(idInput) {
