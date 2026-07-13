@@ -1121,7 +1121,7 @@
         </div>
     </div>
 
-    <script>
+   <script>
         const CLAVE_SECRETA = "admin123";
         let isAdmin = false;
 
@@ -1191,7 +1191,7 @@
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
             sidebar.classList.toggle('open');
-            overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+            if(overlay) overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
         }
 
         function persistirEnLocalStorage() {
@@ -1202,7 +1202,7 @@
 
         function obtenerEstrellasJugador(nombreJugador) {
             if (!nombreJugador) return "";
-            const totalTitulos = listaHistorialCampeones.filter(h => h.jugador.trim().toLowerCase() === nombreJugador.trim().toLowerCase()).length;
+            const totalTitulos = listaHistorialCampeones.filter(h => h.jugador && h.jugador.trim().toLowerCase() === nombreJugador.trim().toLowerCase()).length;
             let estrellasHTML = "";
             for (let i = 0; i < totalTitulos; i++) {
                 estrellasHTML += `<i class="fa-solid fa-star star-icon"></i>`;
@@ -1213,6 +1213,7 @@
         function renderizarTablas() {
             ['A', 'B'].forEach(grupo => {
                 const tbody = document.getElementById(`body-grupo-` + grupo.toLowerCase());
+                if (!tbody) return;
                 tbody.innerHTML = "";
                 
                 datosTorneo[grupo].forEach((jugador, index) => {
@@ -1253,6 +1254,7 @@
         function actualizarCampo(input, grupo, id, campo) {
             let valor = input.value;
             let jugador = datosTorneo[grupo].find(j => j.id === id);
+            if(!jugador) return;
             
             if (campo !== 'nombre') {
                 valor = parseInt(valor) || 0;
@@ -1274,6 +1276,7 @@
         function generarCalendariosHTML() {
             ['A', 'B'].forEach(grupo => {
                 const contenedor = document.getElementById(`contenedor-jornadas-${grupo.toLowerCase()}`);
+                if (!contenedor) return;
                 contenedor.innerHTML = "";
 
                 for (let j = 1; j <= 7; j++) {
@@ -1338,8 +1341,11 @@
                         let valL = localStorage.getItem(`superligaa_cal_${idL}`);
                         let valV = localStorage.getItem(`superligaa_cal_${idV}`);
                         
-                        if(valL !== null) document.getElementById(idL).value = valL;
-                        if(valV !== null) document.getElementById(idV).value = valV;
+                        let inputL = document.getElementById(idL);
+                        let inputV = document.getElementById(idV);
+
+                        if(valL !== null && inputL) inputL.value = valL;
+                        if(valV !== null && inputV) inputV.value = valV;
                     }
                 }
             });
@@ -1391,6 +1397,7 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     let jugador = datosTorneo[grupo].find(j => j.id === id);
+                    if(!jugador) return;
                     jugador.img = e.target.result;
                     persistirEnLocalStorage();
                     renderizarTablas();
@@ -1432,9 +1439,9 @@
             const imgElement = document.getElementById(idFila + "-img");
             
             if(jugador) {
-                txtElement.innerText = jugador.nombre;
+                if(txtElement) txtElement.innerText = jugador.nombre;
                 imagenesBrackets[idFila] = jugador.img;
-                imgElement.innerHTML = jugador.img ? `<img src="${jugador.img}">` : `<i class="fa-solid fa-flag"></i>`;
+                if(imgElement) imgElement.innerHTML = jugador.img ? `<img src="${jugador.img}">` : `<i class="fa-solid fa-flag"></i>`;
                 localStorage.setItem(`superligaa_txt_bracket_${idFila}`, jugador.nombre);
             }
         }
@@ -1464,7 +1471,8 @@
             ];
             inputsBrackets.forEach(id => {
                 let val = localStorage.getItem(`superligaa_input_bracket_${id}`);
-                if(val !== null) document.getElementById(id).value = val;
+                let el = document.getElementById(id);
+                if(val !== null && el) el.value = val;
             });
 
             Object.keys(imagenesBrackets).forEach(idFila => {
@@ -1491,10 +1499,12 @@
             let campeon = determinarGanador('f-t1', 'f-t2', 'sc-f-t1', 'sc-f-t2');
             const txtCamp = document.getElementById('text-campeon');
             
-            if(campeon && campeon.nombre !== 'Ganador S1' && campeon.nombre !== 'Ganador S2') {
-                txtCamp.innerHTML = `<i class='fa-solid fa-crown'></i> Campeón: ${campeon.nombre}`;
-            } else {
-                txtCamp.innerText = "";
+            if(txtCamp) {
+                if(campeon && campeon.nombre !== 'Ganador S1' && campeon.nombre !== 'Ganador S2') {
+                    txtCamp.innerHTML = `<i class='fa-solid fa-crown'></i> Campeón: ${campeon.nombre}`;
+                } else {
+                    txtCamp.innerText = "";
+                }
             }
         }
 
@@ -1503,28 +1513,32 @@
             const destTxt = document.getElementById(destinoId);
             const destImg = document.getElementById(destinoId + "-img");
 
-            if (resultado) {
-                destTxt.innerText = resultado.nombre;
-                imagenesBrackets[destinoId] = resultado.img;
-                destImg.innerHTML = resultado.img ? `<img src="${resultado.img}">` : `<i class="fa-solid fa-flag"></i>`;
-                localStorage.setItem(`superligaa_txt_bracket_${destinoId}`, resultado.nombre);
-            } else {
-                destTxt.innerText = porDefecto;
-                imagenesBrackets[destinoId] = "";
-                destImg.innerHTML = `<i class="fa-solid fa-flag"></i>`;
-                localStorage.setItem(`superligaa_txt_bracket_${destinoId}`, porDefecto);
+            if(destTxt) {
+                if (resultado) {
+                    destTxt.innerText = resultado.nombre;
+                    imagenesBrackets[destinoId] = resultado.img;
+                    if(destImg) destImg.innerHTML = resultado.img ? `<img src="${resultado.img}">` : `<i class="fa-solid fa-flag"></i>`;
+                    localStorage.setItem(`superligaa_txt_bracket_${destinoId}`, resultado.nombre);
+                } else {
+                    destTxt.innerText = porDefecto;
+                    imagenesBrackets[destinoId] = "";
+                    if(destImg) destImg.innerHTML = `<i class="fa-solid fa-flag"></i>`;
+                    localStorage.setItem(`superligaa_txt_bracket_${destinoId}`, porDefecto);
+                }
             }
         }
 
         function determinarGanador(t1Id, t2Id, s1Id, s2Id) {
             let t1El = document.getElementById(t1Id);
             let t2El = document.getElementById(t2Id);
-            if(!t1El || !t2El) return null;
+            let s1El = document.getElementById(s1Id);
+            let s2El = document.getElementById(s2Id);
+            if(!t1El || !t2El || !s1El || !s2El) return null;
 
             let t1 = t1El.innerText;
             let t2 = t2El.innerText;
-            let s1 = parseInt(document.getElementById(s1Id).value);
-            let s2 = parseInt(document.getElementById(s2Id).value);
+            let s1 = parseInt(s1El.value);
+            let s2 = parseInt(s2El.value);
 
             if (!isNaN(s1) && !isNaN(s2)) {
                 if (s1 > s2) return { nombre: t1, img: imagenesBrackets[t1Id] };
@@ -1535,6 +1549,7 @@
 
         function renderizarHistorialCampeones() {
             const contenedor = document.getElementById('history-grid-container');
+            if(!contenedor) return;
             contenedor.innerHTML = "";
 
             if(listaHistorialCampeones.length === 0) {
@@ -1655,28 +1670,38 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active-tab'));
 
-            document.getElementById('view-' + viewId).classList.add('active-view');
+            const targetView = document.getElementById('view-' + viewId);
+            if(targetView) targetView.classList.add('active-view');
             
+            const titleEl = document.getElementById('main-view-title');
             if(viewId === 'historial') {
-                document.getElementById('nav-historial').classList.add('active');
-                document.getElementById('tab-historial-btn').classList.add('active-tab');
-                document.getElementById('main-view-title').innerText = "Historial Histórico";
+                const nHist = document.getElementById('nav-historial');
+                const tHist = document.getElementById('tab-historial-btn');
+                if(nHist) nHist.classList.add('active');
+                if(tHist) tHist.classList.add('active-tab');
+                if(titleEl) titleEl.innerText = "Historial Histórico";
             } else {
-                document.getElementById('main-view-title').innerText = "Mundialito 2000";
+                if(titleEl) titleEl.innerText = "Mundialito 2000";
                 if(viewId === 'grupos') {
-                    document.getElementById('nav-grupos').classList.add('active');
-                    document.getElementById('tab-grupos-btn').classList.add('active-tab');
+                    const nG = document.getElementById('nav-grupos');
+                    const tG = document.getElementById('tab-grupos-btn');
+                    if(nG) nG.classList.add('active');
+                    if(tG) tG.classList.add('active-tab');
                 } else if(viewId === 'jornadas') {
-                    document.getElementById('nav-jornadas').classList.add('active');
-                    document.getElementById('tab-jornadas-btn').classList.add('active-tab');
+                    const nJ = document.getElementById('nav-jornadas');
+                    const tJ = document.getElementById('tab-jornadas-btn');
+                    if(nJ) nJ.classList.add('active');
+                    if(tJ) tJ.classList.add('active-tab');
                 } else if(viewId === 'eliminatorio') {
-                    document.getElementById('nav-eliminatorio').classList.add('active');
-                    document.getElementById('tab-eliminatorio-btn').classList.add('active-tab');
+                    const nE = document.getElementById('nav-eliminatorio');
+                    const tE = document.getElementById('tab-eliminatorio-btn');
+                    if(nE) nE.classList.add('active');
+                    if(tE) tE.classList.add('active-tab');
                 }
             }
 
             const sidebar = document.getElementById('sidebar');
-            if(sidebar.classList.contains('open')) toggleSidebar();
+            if(sidebar && sidebar.classList.contains('open')) toggleSidebar();
         }
 
         window.onload = function() {
@@ -1686,7 +1711,6 @@
 
             if(memoriaHistorial) listaHistorialCampeones = JSON.parse(memoriaHistorial);
             
-            // Si hay datos previos guardados en LocalStorage, se usan. Si no, arranca con la estructura de jugadores corregida.
             if(memoriaDatos) {
                 datosTorneo = JSON.parse(memoriaDatos);
             } else {
@@ -1700,6 +1724,6 @@
             calcularBrackets();
             renderizarHistorialCampeones();
         };
-    </script>
+</script>
 </body>
 </html>
