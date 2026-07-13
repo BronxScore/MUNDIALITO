@@ -3,538 +3,706 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUNDIALITO 2026</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Mundialito 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --bg-principal: #121212;
+            --bg-tarjeta: #1a1a1a;
+            --bg-lateral: #161616;
+            --verde-score7: #00cc66;
+            --verde-opaco: rgba(0, 204, 102, 0.08);
+            --texto-blanco: #ffffff;
+            --texto-gris: #888888;
+            --borde-linea: #262626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
         body {
-            background-color: #1e1e1e; /* Gris oscuro mate exacto de Score7 */
-            color: #f8fafc;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-principal);
+            color: var(--texto-blanco);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* BARRA LATERAL */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-lateral);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--borde-linea);
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 20px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--verde-score7);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--borde-linea);
+        }
+
+        .nav-container {
+            padding: 15px 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .nav-section-title {
+            padding: 10px 24px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--texto-gris);
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--texto-blanco);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            gap: 15px;
+        }
+
+        .nav-item:hover {
+            background-color: #222;
+        }
+
+        .nav-item.active {
+            background-color: var(--verde-opaco);
+            color: var(--verde-score7);
+            border-left: 4px solid var(--verde-score7);
+            padding-left: 20px;
+        }
+
+        /* ÁREA PRINCIPAL */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .top-header {
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--borde-linea);
+            text-align: center;
+        }
+
+        .tournament-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--verde-score7);
+            letter-spacing: 0.5px;
+        }
+
+        .content-body {
+            padding: 35px 40px;
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* PESTAÑAS DE LA SEGUNDA IMAGEN */
+        .tabs-header {
+            display: flex;
+            gap: 30px;
+            border-bottom: 1px solid var(--borde-linea);
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            padding: 12px 5px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--texto-gris);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active-tab {
+            color: var(--verde-score7);
+            border-bottom-color: var(--verde-score7);
+        }
+
+        /* CONTENEDOR DE GRUPOS EN PARALELO */
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .group-card {
+            background-color: var(--bg-tarjeta);
+            border: 1px solid var(--borde-linea);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .group-card-title {
+            color: var(--verde-score7);
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .tabla-grupos {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tabla-grupos th {
+            color: var(--texto-gris);
+            font-size: 12px;
+            font-weight: 500;
+            text-align: left;
+            padding: 10px 5px;
+            border-bottom: 1px solid var(--borde-linea);
+        }
+
+        .tabla-grupos td {
+            padding: 8px 5px;
+            border-bottom: 1px solid var(--borde-linea);
+            vertical-align: middle;
+        }
+
+        /* Resaltado filas de clasificación (Top 4) */
+        .row-top-4 td {
+            color: var(--verde-score7);
+        }
+
+        /* Círculo para imágenes de países */
+        .img-circle-selector {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background-color: #2a2a2a;
+            border: 1px dashed #555;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            margin-right: 10px;
+        }
+
+        .img-circle-selector img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .img-circle-selector i {
+            font-size: 10px;
+            color: var(--texto-gris);
+        }
+
+        .img-circle-selector input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Inputs editables */
+        .input-nombre {
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            width: 140px;
+            padding: 2px 5px;
+        }
+
+        .input-nombre:focus {
+            outline: 1px solid var(--verde-score7);
+            background-color: #000;
+        }
+
+        .input-stat {
+            background: transparent;
+            border: none;
+            color: inherit;
+            width: 35px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .input-stat:focus {
+            outline: 1px solid var(--verde-score7);
+            background-color: #000;
+        }
+
+        .btn-guardar-container {
+            grid-column: span 2;
+            text-align: right;
+            margin-top: 15px;
+        }
+
+        .btn-guardar {
+            background-color: var(--verde-score7);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-guardar:hover {
+            background-color: #00aa55;
+        }
+
+        /* INTERFAZ DE ELIMINACIÓN (CUADRO TOP 8) */
+        .bracket-wrapper {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .bracket-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .bracket-column-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--texto-gris);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .match-card {
+            background-color: var(--bg-tarjeta);
+            border: 1px solid var(--borde-linea);
+            border-top: 4px solid var(--verde-score7);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .match-header {
+            background-color: rgba(0, 204, 102, 0.05);
+            padding: 8px 15px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--verde-score7);
+        }
+
+        .match-team-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--borde-linea);
+        }
+
+        .match-team-row:last-child {
+            border-bottom: none;
+        }
+
+        .match-team-info {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active-view {
+            display: block;
+        }
+
+        .placeholder-text {
+            color: var(--texto-gris);
+            font-style: italic;
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-7xl mx-auto">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-emerald-500 mb-2">🏆 MUNDIALITO 2026</h1>
-            <p class="text-gray-400 text-sm md:text-base">100% Gratis, sin registros y alojado en tu GitHub Pages.</p>
-        </header>
+<body>
 
-        <!-- CONFIGURATION PANEL -->
-        <div id="setup-panel" class="bg-[#262626] p-6 rounded-xl shadow-xl border border-neutral-700 mb-8">
-            <h2 class="text-xl font-semibold mb-4 text-emerald-400">1. Registrar los 14 Participantes</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" id="players-input-grid">
-                <!-- JavaScript will generate 14 inputs here -->
-            </div>
-            <div class="text-center">
-                <button id="btn-start" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-all transform hover:scale-105 cursor-pointer">
-                    Generar Torneo (Fase de Grupos + Cuartos de Final)
-                </button>
-            </div>
+    <!-- BARRA LATERAL DE TAREAS (Tercera Imagen) -->
+    <div class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-trophy"></i> Score7
         </div>
-
-        <!-- MAIN TORNEY DASHBOARD -->
-        <div id="tournament-panel" class="hidden">
-            <!-- Share Section -->
-            <div class="bg-neutral-900 border border-neutral-700 p-4 rounded-xl mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div>
-                    <h3 class="font-bold text-emerald-400">🔗 ¡Comparte el estado del torneo en vivo!</h3>
-                    <p class="text-xs text-gray-400">Cada vez que guardas un resultado, la dirección web de arriba cambia. Copia esa URL y pásala a tus amigos para que vean los mismos resultados.</p>
-                </div>
-                <button id="btn-copy-url" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold py-2 px-4 rounded transition-colors cursor-pointer">
-                    Copiar Enlace de Torneo
-                </button>
+        <div class="nav-container">
+            <div class="nav-section-title">Fase de Grupos</div>
+            <div class="nav-item active" id="nav-grupos" onclick="switchMainView('grupos')">
+                <i class="fa-solid fa-list-ol"></i> Clasificación de los grupos
             </div>
 
-            <!-- TABS -->
-            <div class="flex border-b border-neutral-700 mb-6 gap-2">
-                <button id="tab-groups" class="py-2 px-4 font-bold border-b-2 border-emerald-500 text-emerald-400 cursor-pointer">Fase de Grupos (2 Grupos de 7)</button>
-                <button id="tab-bracket" class="py-2 px-4 font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-200 cursor-pointer">Cuadro Eliminatorio (Top 8)</button>
+            <div class="nav-section-title">Fase Eliminatoria</div>
+            <div class="nav-item" id="nav-eliminatorio" onclick="switchMainView('eliminatorio')">
+                <i class="fa-solid fa-diagram-project"></i> Cuadro Eliminatorio
             </div>
 
-            <!-- GROUPS VIEW -->
-            <div id="view-groups" class="space-y-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Grupo A -->
-                    <div class="bg-[#262626] p-4 rounded-xl border border-neutral-700">
-                        <h3 class="text-lg font-bold text-emerald-400 mb-3 border-b border-neutral-700 pb-2">GRUPO A</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead>
-                                    <tr class="text-gray-400 border-b border-neutral-700">
-                                        <th class="py-2">Jugador</th>
-                                        <th>PJ</th>
-                                        <th>G</th>
-                                        <th>E</th>
-                                        <th>P</th>
-                                        <th class="text-emerald-400 font-bold">PTS</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-group-A"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Grupo B -->
-                    <div class="bg-[#262626] p-4 rounded-xl border border-neutral-700">
-                        <h3 class="text-lg font-bold text-emerald-400 mb-3 border-b border-neutral-700 pb-2">GRUPO B</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead>
-                                    <tr class="text-gray-400 border-b border-neutral-700">
-                                        <th class="py-2">Jugador</th>
-                                        <th>PJ</th>
-                                        <th>G</th>
-                                        <th>E</th>
-                                        <th>P</th>
-                                        <th class="text-emerald-400 font-bold">PTS</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-group-B"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Partidos de Grupos -->
-                <div class="bg-[#262626] p-6 rounded-xl border border-neutral-700">
-                    <h3 class="text-xl font-bold mb-4 text-emerald-400">Control de Partidos (Fase de Grupos)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="group-matches-container">
-                        <!-- Matches injected here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- BRACKET VIEW -->
-            <div id="view-bracket" class="hidden space-y-8">
-                <div class="text-center mb-4">
-                    <p class="text-sm text-gray-400">Clasifican automáticamente los 4 mejores de cada grupo al terminar todos sus partidos.</p>
-                </div>
-                
-                <div class="flex flex-col xl:flex-row justify-center items-start gap-8 py-4 overflow-x-auto">
-                    
-                    <!-- CUARTOS DE FINAL -->
-                    <div class="flex flex-col gap-6 w-full max-w-xs shrink-0">
-                        <h4 class="text-center text-sm font-bold text-emerald-400 uppercase tracking-wider">Cuartos de Final</h4>
-                        
-                        <!-- Q1 -->
-                        <div class="bg-[#262626] p-3 rounded-xl border border-neutral-700 shadow-md">
-                            <div class="flex justify-between items-center mb-1 text-xs text-gray-400 font-medium"><span>Llave 1</span></div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span id="q1-p1" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">1º Grupo A</span>
-                                <input type="number" id="q1-s1" class="w-11 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span id="q1-p2" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">4º Grupo B</span>
-                                <input type="number" id="q1-s2" class="w-11 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <button onclick="saveQuarter(1)" class="w-full mt-2 bg-emerald-700 hover:bg-emerald-600 text-[11px] font-bold py-1 rounded cursor-pointer">Guardar Q1</button>
-                        </div>
-
-                        <!-- Q2 -->
-                        <div class="bg-[#262626] p-3 rounded-xl border border-neutral-700 shadow-md">
-                            <div class="flex justify-between items-center mb-1 text-xs text-gray-400 font-medium"><span>Llave 2</span></div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span id="q2-p1" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">2º Grupo B</span>
-                                <input type="number" id="q2-s1" class="w-11 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span id="q2-p2" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">3º Grupo A</span>
-                                <input type="number" id="q2-s2" class="w-11 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <button onclick="saveQuarter(2)" class="w-full mt-2 bg-emerald-700 hover:bg-emerald-600 text-[11px] font-bold py-1 rounded cursor-pointer">Guardar Q2</button>
-                        </div>
-
-                        <!-- Q3 -->
-                        <div class="bg-[#262626] p-3 rounded-xl border border-neutral-700 shadow-md">
-                            <div class="flex justify-between items-center mb-1 text-xs text-gray-400 font-medium"><span>Llave 3</span></div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span id="q3-p1" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">1º Grupo B</span>
-                                <input type="number" id="q3-s1" class="w-11 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span id="q3-p2" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">4º Grupo A</span>
-                                <input type="number" id="q3-s2" class="w-11 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <button onclick="saveQuarter(3)" class="w-full mt-2 bg-emerald-700 hover:bg-emerald-600 text-[11px] font-bold py-1 rounded cursor-pointer">Guardar Q3</button>
-                        </div>
-
-                        <!-- Q4 -->
-                        <div class="bg-[#262626] p-3 rounded-xl border border-neutral-700 shadow-md">
-                            <div class="flex justify-between items-center mb-1 text-xs text-gray-400 font-medium"><span>Llave 4</span></div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span id="q4-p1" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">2º Grupo A</span>
-                                <input type="number" id="q4-s1" class="w-11 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span id="q4-p2" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">3º Grupo B</span>
-                                <input type="number" id="q4-s2" class="w-11 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <button onclick="saveQuarter(4)" class="w-full mt-2 bg-emerald-700 hover:bg-emerald-600 text-[11px] font-bold py-1 rounded cursor-pointer">Guardar Q4</button>
-                        </div>
-                    </div>
-
-                    <!-- SEMIFINALES -->
-                    <div class="flex flex-col gap-12 w-full max-w-xs shrink-0 md:mt-12 xl:mt-16">
-                        <h4 class="text-center text-sm font-bold text-emerald-400 uppercase tracking-wider">Semifinales</h4>
-                        
-                        <!-- Semi 1 -->
-                        <div class="bg-[#262626] p-4 rounded-xl border border-neutral-700 shadow-md">
-                            <div class="flex justify-between items-center mb-2">
-                                <span id="semi1-p1" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">Ganador Q1</span>
-                                <input type="number" id="semi1-s1" class="w-12 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span id="semi1-p2" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">Ganador Q2</span>
-                                <input type="number" id="semi1-s2" class="w-12 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <button onclick="saveSemi(1)" class="w-full mt-3 bg-emerald-700 hover:bg-emerald-600 text-xs font-bold py-1 rounded cursor-pointer">Guardar Semi 1</button>
-                        </div>
-
-                        <!-- Semi 2 -->
-                        <div class="bg-[#262626] p-4 rounded-xl border border-neutral-700 shadow-md">
-                            <div class="flex justify-between items-center mb-2">
-                                <span id="semi2-p1" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">Ganador Q3</span>
-                                <input type="number" id="semi2-s1" class="w-12 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span id="semi2-p2" class="font-semibold text-gray-300 text-sm truncate max-w-[150px]">Ganador Q4</span>
-                                <input type="number" id="semi2-s2" class="w-12 bg-neutral-900 border border-neutral-700 rounded text-center p-1 font-bold text-emerald-400" min="0">
-                            </div>
-                            <button onclick="saveSemi(2)" class="w-full mt-3 bg-emerald-700 hover:bg-emerald-600 text-xs font-bold py-1 rounded cursor-pointer">Guardar Semi 2</button>
-                        </div>
-                    </div>
-
-                    <!-- GRAN FINAL -->
-                    <div class="flex flex-col gap-4 w-full max-w-sm shrink-0 md:mt-24 xl:mt-32 justify-center">
-                        <h4 class="text-center text-sm font-bold text-amber-400 uppercase tracking-wider">🏆 GRAN FINAL</h4>
-                        <div class="bg-gradient-to-b from-neutral-800 to-neutral-900 p-6 rounded-xl border-2 border-amber-500 shadow-2xl">
-                            <div class="flex justify-between items-center mb-4">
-                                <span id="final-p1" class="font-bold text-lg text-gray-200 truncate max-w-[180px]">Ganador Semi 1</span>
-                                <input type="number" id="final-s1" class="w-14 bg-neutral-900 border border-neutral-700 rounded text-center p-2 font-bold text-amber-400 text-lg" min="0">
-                            </div>
-                            <div class="flex justify-between items-center mb-4">
-                                <span id="final-p2" class="font-bold text-lg text-gray-200 truncate max-w-[180px]">Ganador Semi 2</span>
-                                <input type="number" id="final-s2" class="w-14 bg-neutral-900 border border-neutral-700 rounded text-center p-2 font-bold text-amber-400 text-lg" min="0">
-                            </div>
-                            <button onclick="saveFinal()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded-lg shadow-md uppercase tracking-wider cursor-pointer">Definir Campeón</button>
-                            
-                            <div id="champion-box" class="hidden mt-6 text-center bg-amber-950/50 p-4 rounded-lg border border-amber-800">
-                                <p class="text-amber-400 text-xs font-bold tracking-widest uppercase">¡CAMPEÓN DEL TORNEO!</p>
-                                <h2 id="champion-name" class="text-2xl font-black text-white mt-1 drop-shadow">---</h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="nav-section-title">Estadísticas</div>
+            <div class="nav-item" onclick="switchMainView('estadisticas')">
+                <i class="fa-solid fa-chart-column"></i> Estadísticas
             </div>
         </div>
     </div>
 
-    <!-- CORE APPLICATION JAVASCRIPT -->
-    <script>
-        let state = {
-            players: [],
-            groups: { A: [], B: [] },
-            matches: [],
-            bracket: {
-                q1: { p1: '', p2: '', s1: null, s2: null },
-                q2: { p1: '', p2: '', s1: null, s2: null },
-                q3: { p1: '', p2: '', s1: null, s2: null },
-                q4: { p1: '', p2: '', s1: null, s2: null },
-                semi1: { p1: '', p2: '', s1: null, s2: null },
-                semi2: { p1: '', p2: '', s1: null, s2: null },
-                final: { p1: '', p2: '', s1: null, s2: null },
-                champion: ''
-            }
-        };
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-content">
+        <div class="top-header">
+            <div class="tournament-title">🏆 MUNDIALITO 2026</div>
+        </div>
 
-        // Initialize 14 player inputs
-        const grid = document.getElementById('players-input-grid');
-        for (let i = 1; i <= 14; i++) {
-            grid.innerHTML += `
-                <div class="flex items-center gap-2 bg-neutral-900 p-2 rounded border border-neutral-700">
-                    <span class="text-xs font-bold text-neutral-500 w-6">${String(i).padStart(2, '0')}</span>
-                    <input type="text" id="p-name-${i}" value="Jugador ${i}" class="bg-transparent border-none outline-none text-sm w-full font-medium text-slate-200 focus:text-emerald-400" placeholder="Nombre del jugador">
-                </div>
-            `;
-        }
-
-        // Tab shifting
-        document.getElementById('tab-groups').addEventListener('click', () => switchTab('groups'));
-        document.getElementById('tab-bracket').addEventListener('click', () => switchTab('bracket'));
-
-        function switchTab(tab) {
-            if (tab === 'groups') {
-                document.getElementById('view-groups').classList.remove('hidden');
-                document.getElementById('view-bracket').classList.add('hidden');
-                document.getElementById('tab-groups').className = "py-2 px-4 font-bold border-b-2 border-emerald-500 text-emerald-400 cursor-pointer";
-                document.getElementById('tab-bracket').className = "py-2 px-4 font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-200 cursor-pointer";
-            } else {
-                document.getElementById('view-groups').classList.add('hidden');
-                document.getElementById('view-bracket').classList.remove('hidden');
-                document.getElementById('tab-bracket').className = "py-2 px-4 font-bold border-b-2 border-emerald-500 text-emerald-400 cursor-pointer";
-                document.getElementById('tab-groups').className = "py-2 px-4 font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-200 cursor-pointer";
-            }
-        }
-
-        // Start Tournament Generation
-        document.getElementById('btn-start').addEventListener('click', () => {
-            state.players = [];
-            for (let i = 1; i <= 14; i++) {
-                let val = document.getElementById(`p-name-${i}`).value.trim();
-                state.players.push(val || `Jugador ${i}`);
-            }
+        <div class="content-body">
             
-            let shuffled = [...state.players].sort(() => Math.random() - 0.5);
-            state.groups.A = shuffled.slice(0, 7);
-            state.groups.B = shuffled.slice(7, 14);
+            <!-- CONTENEDOR DE PESTAÑAS INTERNAS (Segunda Imagen) -->
+            <div class="tabs-header">
+                <div class="tab-btn active-tab" id="tab-grupos-btn" onclick="switchMainView('grupos')">Fase de Grupos (2 Grupos de 7)</div>
+                <div class="tab-btn" id="tab-eliminatorio-btn" onclick="switchMainView('eliminatorio')">Cuadro Eliminatorio (Top 8)</div>
+            </div>
 
-            state.matches = [];
-            generateRoundRobin(state.groups.A, 'A');
-            generateRoundRobin(state.groups.B, 'B');
-
-            renderAll();
-            document.getElementById('setup-panel').classList.add('hidden');
-            document.getElementById('tournament-panel').classList.remove('hidden');
-            updateURLHash();
-        });
-
-        function generateRoundRobin(groupPlayers, groupLetter) {
-            let pool = [...groupPlayers];
-            let num = pool.length;
-            for (let i = 0; i < num; i++) {
-                for (let j = i + 1; j < num; j++) {
-                    state.matches.push({
-                        id: `${groupLetter}-${i}-${j}`,
-                        group: groupLetter,
-                        p1: pool[i],
-                        p2: pool[j],
-                        s1: null,
-                        s2: null
-                    });
-                }
-            }
-        }
-
-        function renderAll() {
-            renderTables();
-            renderMatches();
-            renderBracketUI();
-        }
-
-        function renderTables() {
-            ['A', 'B'].forEach(g => {
-                let stats = {};
-                state.groups[g].forEach(p => {
-                    stats[p] = { name: p, pj: 0, g: 0, e: 0, p: 0, pts: 0 };
-                });
-
-                state.matches.filter(m => m.group === g).forEach(m => {
-                    if (m.s1 !== null && m.s2 !== null) {
-                        stats[m.p1].pj++;
-                        stats[m.p2].pj++;
-                        if (m.s1 > m.s2) {
-                            stats[m.p1].g++; stats[m.p1].pts += 3;
-                            stats[m.p2].p++;
-                        } else if (m.s1 < m.s2) {
-                            stats[m.p2].g++; stats[m.p2].pts += 3;
-                            stats[m.p1].p++;
-                        } else {
-                            stats[m.p1].e++; stats[m.p1].pts += 1;
-                            stats[m.p2].e++; stats[m.p2].pts += 1;
-                        }
-                    }
-                });
-
-                let sorted = Object.values(stats).sort((a,b) => b.pts - a.pts || b.g - a.g);
-                
-                let tbody = document.getElementById(`table-group-${g}`);
-                tbody.innerHTML = '';
-                sorted.forEach((row, index) => {
-                    // Highlight 4 players in Score7 exact green
-                    let highlightClass = index < 4 ? 'bg-[#1b3322] text-[#4ade80] font-semibold border-l-4 border-[#22c55e]' : '';
-                    tbody.innerHTML += `
-                        <tr class="border-b border-neutral-700/50 ${highlightClass}">
-                            <td class="py-2 flex items-center gap-2">
-                                <span class="text-xs text-neutral-500">${index+1}</span>
-                                <span>${row.name}</span>
-                            </td>
-                            <td>${row.pj}</td>
-                            <td>${row.g}</td>
-                            <td>${row.e}</td>
-                            <td>${row.p}</td>
-                            <td class="font-bold text-base">${row.pts}</td>
-                        </tr>
-                    `;
-                });
-
-                // Auto feed Quarters top 4
-                if (g === 'A' && sorted.length >= 4) {
-                    state.bracket.q1.p1 = sorted[0].name;
-                    state.bracket.q4.p1 = sorted[1].name;
-                    state.bracket.q2.p2 = sorted[2].name;
-                    state.bracket.q3.p2 = sorted[3].name;
-                }
-                if (g === 'B' && sorted.length >= 4) {
-                    state.bracket.q3.p1 = sorted[0].name;
-                    state.bracket.q2.p1 = sorted[1].name;
-                    state.bracket.q4.p2 = sorted[2].name;
-                    state.bracket.q1.p2 = sorted[3].name;
-                }
-            });
-        }
-
-        function renderMatches() {
-            let container = document.getElementById('group-matches-container');
-            container.innerHTML = '';
-            state.matches.forEach((m, idx) => {
-                let s1_val = m.s1 !== null ? m.s1 : '';
-                let s2_val = m.s2 !== null ? m.s2 : '';
-                container.innerHTML += `
-                    <div class="bg-neutral-900 p-3 rounded-lg border border-neutral-800 flex items-center justify-between gap-2 text-sm">
-                        <div class="flex-1 text-right font-medium pr-1 truncate">${m.p1}</div>
-                        <div class="flex items-center gap-1">
-                            <input type="number" id="match-${idx}-s1" value="${s1_val}" class="w-10 bg-neutral-800 text-center border border-neutral-700 rounded p-1 font-bold text-emerald-300" min="0">
-                            <span class="text-neutral-600 font-bold">-</span>
-                            <input type="number" id="match-${idx}-s2" value="${s2_val}" class="w-10 bg-neutral-800 text-center border border-neutral-700 rounded p-1 font-bold text-emerald-300" min="0">
-                        </div>
-                        <div class="flex-1 text-left font-medium pl-1 truncate">${m.p2}</div>
-                        <button onclick="saveMatchScore(${idx})" class="bg-emerald-600/80 hover:bg-emerald-600 text-white text-xs px-2 py-1 rounded transition-colors cursor-pointer ml-1">💾</button>
+            <!-- VISTA: FASE DE GRUPOS EDITABLE -->
+            <div id="view-grupos" class="view-section active-view">
+                <div class="groups-grid">
+                    
+                    <!-- GRUPO A -->
+                    <div class="group-card">
+                        <div class="group-card-title">Grupo A</div>
+                        <table class="tabla-grupos">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px;">#</th>
+                                    <th>Jugador</th>
+                                    <th style="width: 40px; text-align: center;">PJ</th>
+                                    <th style="width: 40px; text-align: center;">G</th>
+                                    <th style="width: 40px; text-align: center;">E</th>
+                                    <th style="width: 40px; text-align: center;">P</th>
+                                    <th style="width: 50px; text-align: center;">PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-grupo-a">
+                                <!-- 7 Filas directas preestablecidas -->
+                                <tr class="row-top-4"><td>1</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 1"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0" style="font-weight:700;"></td></tr>
+                                <tr class="row-top-4"><td>2</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 2"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0" style="font-weight:700;"></td></tr>
+                                <tr class="row-top-4"><td>3</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 3"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0" style="font-weight:700;"></td></tr>
+                                <tr class="row-top-4"><td>4</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 4"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0" style="font-weight:700;"></td></tr>
+                                <tr><td>5</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 5"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td></tr>
+                                <tr><td>6</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 6"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td></tr>
+                                <tr><td>7</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 7"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                `;
-            });
+
+                    <!-- GRUPO B -->
+                    <div class="group-card">
+                        <div class="group-card-title">Grupo B</div>
+                        <table class="tabla-grupos">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px;">#</th>
+                                    <th>Jugador</th>
+                                    <th style="width: 40px; text-align: center;">PJ</th>
+                                    <th style="width: 40px; text-align: center;">G</th>
+                                    <th style="width: 40px; text-align: center;">E</th>
+                                    <th style="width: 40px; text-align: center;">P</th>
+                                    <th style="width: 50px; text-align: center;">PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-grupo-b">
+                                <tr class="row-top-4"><td>1</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 8"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0" style="font-weight:700;"></td></tr>
+                                <tr class="row-top-4"><td>2</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 9"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0" style="font-weight:700;"></td></tr>
+                                <tr class="row-top-4"><td>3</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 10"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0" style="font-weight:700;"></td></tr>
+                                <tr class="row-top-4"><td>4</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 11"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0" style="font-weight:700;"></td></tr>
+                                <tr><td>5</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 12"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td></tr>
+                                <tr><td>6</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 13"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td></tr>
+                                <tr><td>7</td><td><div class="img-circle-selector"><i class="fa-solid fa-image"></i><input type="file" onchange="previewFlag(this)"></div><input type="text" class="input-nombre" value="Jugador 14"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td><td><input type="number" class="input-stat" value="0"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- BOTÓN GUARDAR CAMBIOS -->
+                    <div class="btn-guardar-container">
+                        <button class="btn-guardar" onclick="guardarCambiosYCruzar()"><i class="fa-solid fa-floppy-disk"></i> Guardar Cambios</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: CUADRO ELIMINATORIO CON CRUCES DINÁMICOS DE LA IMAGEN 4 -->
+            <div id="view-eliminatorio" class="view-section">
+                <div class="bracket-wrapper">
+                    
+                    <!-- CUARTOS DE FINAL -->
+                    <div class="bracket-column">
+                        <div class="bracket-column-title">Cuartos de final</div>
+                        
+                        <!-- Competencia A1 -->
+                        <div class="match-card">
+                            <div class="match-header">Competencia A1</div>
+                            <div class="match-team-row">
+                                <div class="match-team-info" id="cell-a1-t1">1º Grupo A</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-a1-t1" oninput="calcularLlaves()">
+                            </div>
+                            <div class="match-team-row">
+                                <div class="match-team-info" id="cell-a1-t2">4º Grupo B</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-a1-t2" oninput="calcularLlaves()">
+                            </div>
+                        </div>
+
+                        <!-- Competencia A2 -->
+                        <div class="match-card">
+                            <div class="match-header">Competencia A2</div>
+                            <div class="match-team-row">
+                                <div class="match-team-info" id="cell-a2-t1">1º Grupo B</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-a2-t1" oninput="calcularLlaves()">
+                            </div>
+                            <div class="match-team-row">
+                                <div class="match-team-info" id="cell-a2-t2">4º Grupo A</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-a2-t2" oninput="calcularLlaves()">
+                            </div>
+                        </div>
+
+                        <!-- Competencia A3 -->
+                        <div class="match-card">
+                            <div class="match-header">Competencia A3</div>
+                            <div class="match-team-row">
+                                <div class="match-team-info" id="cell-a3-t1">2º Grupo A</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-a3-t1" oninput="calcularLlaves()">
+                            </div>
+                            <div class="match-team-row">
+                                <div class="match-team-info" id="cell-a3-t2">3º Grupo B</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-a3-t2" oninput="calcularLlaves()">
+                            </div>
+                        </div>
+
+                        <!-- Competencia A4 -->
+                        <div class="match-card">
+                            <div class="match-header">Competencia A4</div>
+                            <div class="match-team-row">
+                                <div class="match-team-info" id="cell-a4-t1">2º Grupo B</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-a4-t1" oninput="calcularLlaves()">
+                            </div>
+                            <div class="match-team-row">
+                                <div class="match-team-info" id="cell-a4-t2">3º Grupo A</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-a4-t2" oninput="calcularLlaves()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEMIFINALES -->
+                    <div class="bracket-column" style="justify-content: center; gap: 60px; margin-top: 40px;">
+                        <div class="bracket-column-title">Semifinales</div>
+                        
+                        <!-- Semifinal 1 -->
+                        <div class="match-card">
+                            <div class="match-header">Semifinal #1</div>
+                            <div class="match-team-row">
+                                <div class="match-team-info placeholder-text" id="cell-s1-t1">Ganador A1</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-s1-t1" oninput="calcularLlaves()">
+                            </div>
+                            <div class="match-team-row">
+                                <div class="match-team-info placeholder-text" id="cell-s1-t2">Ganador A4</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-s1-t2" oninput="calcularLlaves()">
+                            </div>
+                        </div>
+
+                        <!-- Semifinal 2 -->
+                        <div class="match-card">
+                            <div class="match-header">Semifinal #2</div>
+                            <div class="match-team-row">
+                                <div class="match-team-info placeholder-text" id="cell-s2-t1">Ganador A2</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-s2-t1" oninput="calcularLlaves()">
+                            </div>
+                            <div class="match-team-row">
+                                <div class="match-team-info placeholder-text" id="cell-s2-t2">Ganador A3</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-s2-t2" oninput="calcularLlaves()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FINAL -->
+                    <div class="bracket-column" style="justify-content: center; margin-top: 130px;">
+                        <div class="bracket-column-title">Final</div>
+                        
+                        <div class="match-card">
+                            <div class="match-header">Gran Final</div>
+                            <div class="match-team-row">
+                                <div class="match-team-info placeholder-text" id="cell-f-t1">Ganador Semifinal 1</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-f-t1" oninput="calcularLlaves()">
+                            </div>
+                            <div class="match-team-row">
+                                <div class="match-team-info placeholder-text" id="cell-f-t2">Ganador Semifinal 2</div>
+                                <input type="number" class="input-stat" placeholder="0" id="sc-f-t2" oninput="calcularLlaves()">
+                            </div>
+                        </div>
+
+                        <div id="text-campeon" style="margin-top: 25px; text-align: center; color: var(--verde-score7); font-weight: 700; font-size: 16px;"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- SECCIÓN ESTADÍSTICAS -->
+            <div id="view-estadisticas" class="view-section">
+                <h2>Estadísticas Generales</h2>
+                <p class="placeholder-text" style="margin-top: 15px;">Aquí se despliegan automáticamente las tablas de rendimiento una vez guardadas.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- LOGICA SCRIPT -->
+    <script>
+        // Cambiar entre pestañas globales e internas transparentemente
+        function switchMainView(viewId) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active-view'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active-tab'));
+
+            document.getElementById('view-' + viewId).classList.add('active-view');
+            
+            if(viewId === 'grupos') {
+                document.getElementById('nav-grupos').classList.add('active');
+                document.getElementById('tab-grupos-btn').classList.add('active-tab');
+            } else if(viewId === 'eliminatorio') {
+                document.getElementById('nav-eliminatorio').classList.add('active');
+                document.getElementById('tab-eliminatorio-btn').classList.add('active-tab');
+            }
         }
 
-        function saveMatchScore(idx) {
-            let s1 = document.getElementById(`match-${idx}-s1`).value;
-            let s2 = document.getElementById(`match-${idx}-s2`).value;
-            if (s1 === '' || s2 === '') {
-                state.matches[idx].s1 = null;
-                state.matches[idx].s2 = null;
-            } else {
-                state.matches[idx].s1 = parseInt(s1);
-                state.matches[idx].s2 = parseInt(s2);
+        // Previsualizar bandera localmente en su contenedor correspondiente
+        function previewFlag(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var container = input.parentElement;
+                    var icon = container.querySelector('i');
+                    if(icon) icon.remove();
+                    
+                    var img = container.querySelector('img');
+                    if(!img) {
+                        img = document.createElement('img');
+                        container.appendChild(img);
+                    }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
             }
-            renderTables();
-            renderBracketUI();
-            updateURLHash();
         }
 
-        function renderBracketUI() {
-            // Update quarter names
-            for(let i=1; i<=4; i++) {
-                document.getElementById(`q${i}-p1`).innerText = state.bracket[`q${i}`].p1 || `${i}º G-A`;
-                document.getElementById(`q${i}-p2`).innerText = state.bracket[`q${i}`].p2 || `${5-i}º G-B`;
-                document.getElementById(`q${i}-s1`).value = state.bracket[`q${i}`].s1 !== null ? state.bracket[`q${i}`].s1 : '';
-                document.getElementById(`q${i}-s2`).value = state.bracket[`q${i}`].s2 !== null ? state.bracket[`q${i}`].s2 : '';
-            }
+        // Guardar cambios manuales y reestructurar de manera fija las llaves sin alterar el orden manual dado por el usuario
+        function guardarCambiosYCruzar() {
+            const inputsA = document.getElementById('body-grupo-a').querySelectorAll('.input-nombre');
+            const inputsB = document.getElementById('body-grupo-b').querySelectorAll('.input-nombre');
 
-            // Semis
-            document.getElementById('semi1-p1').innerText = state.bracket.semi1.p1 || 'Ganador Q1';
-            document.getElementById('semi1-p2').innerText = state.bracket.semi1.p2 || 'Ganador Q2';
-            document.getElementById('semi2-p1').innerText = state.bracket.semi2.p1 || 'Ganador Q3';
-            document.getElementById('semi2-p2').innerText = state.bracket.semi2.p2 || 'Ganador Q4';
+            // Posicionamiento de Cuartos según la regla exacta:
+            // Competencia A1: 1º Grupo A vs 4º Grupo B
+            document.getElementById('cell-a1-t1').innerText = "1º " + inputsA[0].value;
+            document.getElementById('cell-a1-t2').innerText = "4º " + inputsB[3].value;
 
-            document.getElementById('semi1-s1').value = state.bracket.semi1.s1 !== null ? state.bracket.semi1.s1 : '';
-            document.getElementById('semi1-s2').value = state.bracket.semi1.s2 !== null ? state.bracket.semi1.s2 : '';
-            document.getElementById('semi2-s1').value = state.bracket.semi2.s1 !== null ? state.bracket.semi2.s1 : '';
-            document.getElementById('semi2-s2').value = state.bracket.semi2.s2 !== null ? state.bracket.semi2.s2 : '';
+            // Competencia A2: 1º Grupo B vs 4º Grupo A
+            document.getElementById('cell-a2-t1').innerText = "1º " + inputsB[0].value;
+            document.getElementById('cell-a2-t2').innerText = "4º " + inputsA[3].value;
+
+            // Competencia A3: 2º Grupo A vs 3º Grupo B
+            document.getElementById('cell-a3-t1').innerText = "2º " + inputsA[1].value;
+            document.getElementById('cell-a3-t2').innerText = "3º " + inputsB[2].value;
+
+            // Competencia A4: 2º Grupo B vs 3º Grupo A
+            document.getElementById('cell-a4-t1').innerText = "2º " + inputsB[1].value;
+            document.getElementById('cell-a4-t2').innerText = "3º " + inputsA[2].value;
+
+            alert("¡Cambios guardados con éxito! Los nombres han sido actualizados en la Fase Eliminatoria.");
+            calcularLlaves();
+        }
+
+        // Calcular ganadores de llaves según los goles agregados
+        function calcularLlaves() {
+            // Ganador A1
+            let w_a1 = verificarGanador('cell-a1-t1', 'cell-a1-t2', 'sc-a1-t1', 'sc-a1-t2', 'Ganador A1');
+            document.getElementById('cell-s1-t1').innerText = w_a1;
+
+            // Ganador A4
+            let w_a4 = verificarGanador('cell-a4-t1', 'cell-a4-t2', 'sc-a4-t1', 'sc-a4-t2', 'Ganador A4');
+            document.getElementById('cell-s1-t2').innerText = w_a4;
+
+            // Ganador A2
+            let w_a2 = verificarGanador('cell-a2-t1', 'cell-a2-t2', 'sc-a2-t1', 'sc-a2-t2', 'Ganador A2');
+            document.getElementById('cell-s2-t1').innerText = w_a2;
+
+            // Ganador A3
+            let w_a3 = verificarGanador('cell-a3-t1', 'cell-a3-t2', 'sc-a3-t1', 'sc-a3-t2', 'Ganador A3');
+            document.getElementById('cell-s2-t2').innerText = w_a3;
+
+            // Semifinal 1
+            let w_s1 = verificarGanador('cell-s1-t1', 'cell-s1-t2', 'sc-s1-t1', 'sc-s1-t2', 'Ganador Semifinal 1');
+            document.getElementById('cell-f-t1').innerText = w_s1;
+
+            // Semifinal 2
+            let w_s2 = verificarGanador('cell-s2-t1', 'cell-s2-t2', 'sc-s2-t1', 'sc-s2-t2', 'Ganador Semifinal 2');
+            document.getElementById('cell-f-t2').innerText = w_s2;
 
             // Final
-            document.getElementById('final-p1').innerText = state.bracket.final.p1 || 'Ganador Semi 1';
-            document.getElementById('final-p2').innerText = state.bracket.final.p2 || 'Ganador Semi 2';
-            document.getElementById('final-s1').value = state.bracket.final.s1 !== null ? state.bracket.final.s1 : '';
-            document.getElementById('final-s2').value = state.bracket.final.s2 !== null ? state.bracket.final.s2 : '';
-
-            if (state.bracket.champion) {
-                document.getElementById('champion-name').innerText = state.bracket.champion;
-                document.getElementById('champion-box').classList.remove('hidden');
+            let campeon = verificarGanador('cell-f-t1', 'cell-f-t2', 'sc-f-t1', 'sc-f-t2', '');
+            if(campeon && campeon !== 'Ganador Semifinal 1' && campeon !== 'Ganador Semifinal 2') {
+                document.getElementById('text-campeon').innerHTML = "🥇 ¡Campeón: " + campeon + "! 🥇";
             } else {
-                document.getElementById('champion-box').classList.add('hidden');
+                document.getElementById('text-campeon').innerText = "";
             }
         }
 
-        function saveQuarter(num) {
-            let s1 = document.getElementById(`q${num}-s1`).value;
-            let s2 = document.getElementById(`q${num}-s2`).value;
-            if (s1 === '' || s2 === '') return alert('Ingresa marcador.');
-            s1 = parseInt(s1); s2 = parseInt(s2);
-            if (s1 === s2) return alert('Debe haber un ganador (usa penales si empatan).');
-            
-            state.bracket[`q${num}`].s1 = s1;
-            state.bracket[`q${num}`].s2 = s2;
+        function verificarGanador(t1Id, t2Id, s1Id, s2Id, porDefecto) {
+            let t1 = document.getElementById(t1Id).innerText;
+            let t2 = document.getElementById(t2Id).innerText;
+            let s1 = parseInt(document.getElementById(s1Id).value);
+            let s2 = parseInt(document.getElementById(s2Id).value);
 
-            let winner = s1 > s2 ? state.bracket[`q${num}`].p1 : state.bracket[`q${num}`].p2;
-            if (num === 1) state.bracket.semi1.p1 = winner;
-            if (num === 2) state.bracket.semi1.p2 = winner;
-            if (num === 3) state.bracket.semi2.p1 = winner;
-            if (num === 4) state.bracket.semi2.p2 = winner;
-
-            renderBracketUI();
-            updateURLHash();
-        }
-
-        function saveSemi(num) {
-            let s1 = document.getElementById(`semi${num}-s1`).value;
-            let s2 = document.getElementById(`semi${num}-s2`).value;
-            if (s1 === '' || s2 === '') return alert('Ingresa marcador.');
-            s1 = parseInt(s1); s2 = parseInt(s2);
-            if (s1 === s2) return alert('Debe haber un ganador.');
-            
-            state.bracket[`semi${num}`].s1 = s1;
-            state.bracket[`semi${num}`].s2 = s2;
-
-            let winner = s1 > s2 ? state.bracket[`semi${num}`].p1 : state.bracket[`semi${num}`].p2;
-            if (num === 1) state.bracket.final.p1 = winner;
-            if (num === 2) state.bracket.final.p2 = winner;
-
-            renderBracketUI();
-            updateURLHash();
-        }
-
-        function saveFinal() {
-            let s1 = document.getElementById('final-s1').value;
-            let s2 = document.getElementById('final-s2').value;
-            if (s1 === '' || s2 === '') return alert('Ingresa marcador final.');
-            s1 = parseInt(s1); s2 = parseInt(s2);
-            if (s1 === s2) return alert('Debe haber un campeón.');
-
-            state.bracket.final.s1 = s1;
-            state.bracket.final.s2 = s2;
-            state.bracket.champion = s1 > s2 ? state.bracket.final.p1 : state.bracket.final.p2;
-            
-            renderBracketUI();
-            updateURLHash();
-        }
-
-        function updateURLHash() {
-            let str = JSON.stringify(state);
-            let base64 = btoa(unescape(encodeURIComponent(str)));
-            window.location.hash = base64;
-        }
-
-        function loadFromHash() {
-            if (window.location.hash) {
-                try {
-                    let base64 = window.location.hash.substring(1);
-                    let str = decodeURIComponent(escape(atob(base64)));
-                    state = JSON.parse(str);
-                    document.getElementById('setup-panel').classList.add('hidden');
-                    document.getElementById('tournament-panel').classList.remove('hidden');
-                    renderAll();
-                } catch(e) {
-                    console.error("Error", e);
-                }
+            if (!isNaN(s1) && !isNaN(s2)) {
+                if (s1 > s2) return t1;
+                if (s2 > s1) return t2;
             }
+            return porDefecto;
         }
 
-        document.getElementById('btn-copy-url').addEventListener('click', () => {
-            navigator.clipboard.writeText(window.location.href);
-            alert('¡Enlace de torneo copiado!');
-        });
-
-        window.addEventListener('load', loadFromHash);
+        window.onload = function() {
+            // Inicializar datos sin alertar
+            const inputsA = document.getElementById('body-grupo-a').querySelectorAll('.input-nombre');
+            const inputsB = document.getElementById('body-grupo-b').querySelectorAll('.input-nombre');
+            document.getElementById('cell-a1-t1').innerText = "1º " + inputsA[0].value;
+            document.getElementById('cell-a1-t2').innerText = "4º " + inputsB[3].value;
+            document.getElementById('cell-a2-t1').innerText = "1º " + inputsB[0].value;
+            document.getElementById('cell-a2-t2').innerText = "4º " + inputsA[3].value;
+            document.getElementById('cell-a3-t1').innerText = "2º " + inputsA[1].value;
+            document.getElementById('cell-a3-t2').innerText = "3º " + inputsB[2].value;
+            document.getElementById('cell-a4-t1').innerText = "2º " + inputsB[1].value;
+            document.getElementById('cell-a4-t2').innerText = "3º " + inputsA[2].value;
+        };
     </script>
 </body>
 </html>
