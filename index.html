@@ -1412,13 +1412,13 @@ function actualizarCampo(input, grupo, id, campo) {
                         }
 
                         let visitImgContainer = document.getElementById(`img-${grupo}-j${j}-m${m}-v`);
-                        if(visitImgContainer) {
+                        if (visitImgContainer) {
                             visitImgContainer.innerHTML = (jugadorV && jugadorV.img) ? `<img src="${jugadorV.img}">` : `<i class="fa-solid fa-flag"></i>`;
                         }
                     }
                 }
             });
-        }
+        } // Cierre limpio de la función anterior. ¡Aquí no debe haber nada flotando!
 
         function guardarScoreCalendario(idInput) {
             let el = document.getElementById(idInput);
