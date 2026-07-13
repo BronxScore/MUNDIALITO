@@ -1146,6 +1146,18 @@
             ]
         };
 
+        // Fixtures Round Robin perfectos estáticos de 7 jornadas (3 partidos + 1 descanso por jornada)
+        // Valores mapean las posiciones originales de los arrays (0 a 6)
+        const fixtureEstatico = [
+            { j: 1, partidos: [[1, 6], [2, 5], [3, 4]], descansa: 0 }, // Adrian-Robert, Maxi-Gabo, Fran-Bronx | Descansa Dani
+            { j: 2, partidos: [[0, 6], [1, 5], [2, 3]], descansa: 4 }, // Dani-Robert, Adrian-Gabo, Maxi-Fran | Descansa Bronx
+            { j: 3, partidos: [[0, 5], [6, 3], [1, 4]], descansa: 2 }, // Dani-Gabo, Robert-Fran, Adrian-Bronx | Descansa Maxi
+            { j: 4, partidos: [[0, 3], [5, 4], [6, 2]], descansa: 1 }, // Dani-Fran, Gabo-Bronx, Robert-Maxi | Descansa Adrian
+            { j: 5, partidos: [[0, 4], [3, 2], [5, 1]], descansa: 6 }, // Dani-Bronx, Fran-Maxi, Gabo-Adrian | Descansa Robert
+            { j: 6, partidos: [[0, 2], [4, 1], [3, 6]], descansa: 5 }, // Dani-Maxi, Bronx-Adrian, Fran-Robert | Descansa Gabo
+            { j: 7, partidos: [[0, 1], [2, 6], [5, 4]], descansa: 3 }  // Dani-Adrian, Maxi-Robert, Gabo-Bronx | Descansa Fran
+        ];
+
         let datosTorneo = JSON.parse(JSON.stringify(estructuraLimpia));
 
         let imagenesBrackets = {
@@ -1321,27 +1333,19 @@
                 const idBase = grupo === 'A' ? 1 : 8;
                 const jugadores = [];
                 
-                // Mapeamos los 7 jugadores en un array ordenado (0 al 6) basado en su ID original
+                // Mapeo estable por orden de id original
                 for (let i = 0; i < 7; i++) {
                     const idBuscado = idBase + i;
-                    jugadores.push(datosTorneo[grupo].find(j => j.id === idBuscado));
+                    // Buscamos siempre en la estructura limpia/inicial para que el orden del fixture no varíe al ordenar la tabla
+                    jugadores.push(estructuraLimpia[grupo].find(j => j.id === idBuscado));
                 }
 
-                // ALGORITMO ROUND ROBIN DINÁMICO PERFECTO PARA 7 JUGADORES
-                for (let j = 1; j <= 7; j++) {
-                    let partidosJornada = [];
-                    let idxDescanso = (j - 1) % 7; 
-                    let jugadorLibre = jugadores[idxDescanso];
+                // Ajustar nombres e imágenes dinámicamente según lo que tenga cargado datosTorneo actualmente
+                const jugadoresActuales = jugadores.map(j => datosTorneo[grupo].find(act => act.id === j.id));
 
-                    let activos = [];
-                    for (let k = 0; k < 7; k++) {
-                        if (k !== idxDescanso) activos.push(k);
-                    }
-
-                    // Emparejamiento perfecto balanceado
-                    partidosJornada.push([activos[0], activos[5]]);
-                    partidosJornada.push([activos[1], activos[4]]);
-                    partidosJornada.push([activos[2], activos[3]]);
+                fixtureEstatico.forEach(config => {
+                    let j = config.j;
+                    let jugadorLibre = jugadoresActuales[config.descansa];
 
                     let descansoEl = document.getElementById(`descanso-${grupo}-j${j}`);
                     if (descansoEl) {
@@ -1349,11 +1353,11 @@
                     }
 
                     for (let m = 1; m <= 3; m++) {
-                        let idxL = partidosJornada[m - 1][0];
-                        let idxV = partidosJornada[m - 1][1];
+                        let idxL = config.partidos[m - 1][0];
+                        let idxV = config.partidos[m - 1][1];
                         
-                        let jugadorL = jugadores[idxL];
-                        let jugadorV = jugadores[idxV];
+                        let jugadorL = jugadoresActuales[idxL];
+                        let jugadorV = jugadoresActuales[idxV];
 
                         let localNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-l-name`);
                         let visitNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-v-name`);
@@ -1371,7 +1375,7 @@
                             visitImgContainer.innerHTML = (jugadorV && jugadorV.img) ? `<img src="${jugadorV.img}">` : `<i class="fa-solid fa-flag"></i>`;
                         }
                     }
-                }
+                });
             });
         }
 
@@ -1428,23 +1432,14 @@
                 const jugadores = [];
                 for (let i = 0; i < 7; i++) {
                     const idBuscado = idBase + i;
-                    jugadores.push(datosTorneo[grupo].find(j => j.id === idBuscado));
+                    jugadores.push(estructuraLimpia[grupo].find(j => j.id === idBuscado));
                 }
 
-                // Cálculo exacto usando el mismo algoritmo dinámico Round Robin
-                for (let j = 1; j <= 7; j++) {
-                    let idxDescanso = (j - 1) % 7;
-                    let activos = [];
-                    for (let k = 0; k < 7; k++) {
-                        if (k !== idxDescanso) activos.push(k);
-                    }
+                const jugadoresActuales = jugadores.map(j => datosTorneo[grupo].find(act => act.id === j.id));
 
-                    let partidosJornada = [
-                        [activos[0], activos[5]],
-                        [activos[1], activos[4]],
-                        [activos[2], activos[3]]
-                    ];
-
+                // Cálculo exacto usando la matriz Round Robin fija sin repeticiones
+                fixtureEstatico.forEach(config => {
+                    let j = config.j;
                     for (let m = 1; m <= 3; m++) {
                         let idL = `input-${grupo}-j${j}-m${m}-l`;
                         let idV = `input-${grupo}-j${j}-m${m}-v`;
@@ -1456,11 +1451,11 @@
                             let golesL = parseInt(valL);
                             let golesV = parseInt(valV);
 
-                            let idxL = partidosJornada[m - 1][0];
-                            let idxV = partidosJornada[m - 1][1];
+                            let idxL = config.partidos[m - 1][0];
+                            let idxV = config.partidos[m - 1][1];
 
-                            let jugadorL = jugadores[idxL];
-                            let jugadorV = jugadores[idxV];
+                            let jugadorL = jugadoresActuales[idxL];
+                            let jugadorV = jugadoresActuales[idxV];
 
                             if (jugadorL && jugadorV) {
                                 jugadorL.pj++;
@@ -1489,9 +1484,9 @@
                             }
                         }
                     }
-                }
+                });
 
-                // Ordenación justa y fija
+                // Ordenación justa por puntos, GD y GF
                 datosTorneo[grupo].sort((a, b) => {
                     if (b.pts !== a.pts) return b.pts - a.pts;
                     if (b.gd !== a.gd) return b.gd - a.gd;
