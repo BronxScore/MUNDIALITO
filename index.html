@@ -1125,7 +1125,7 @@
         const CLAVE_SECRETA = "admin123";
         let isAdmin = false;
 
-        // ESTRUCTURA DEFINITIVA CON NOMBRE DE JUGADORES CONFIRMADOS
+        // ESTRUCTURA CORREGIDA CON LOS JUGADORES DEL GRUPO A Y GRUPO B
         const estructuraLimpia = {
             A: [
                 {id: 1, nombre: "Dani", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
@@ -1138,12 +1138,12 @@
             ],
             B: [
                 {id: 8, nombre: "Minibronx", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
-                {id: 9, nombre: "Brayham", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
-                {id: 10, nombre: "Henryto", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
-                {id: 11, nombre: "Joel", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
-                {id: 12, nombre: "Oscar", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
-                {id: 13, nombre: "Nowell", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
-                {id: 14, nombre: "Cesar", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""}
+                {id: 9, nombre: "brayham", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
+                {id: 10, nombre: "henryto", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
+                {id: 11, nombre: "joel", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
+                {id: 12, nombre: "oscar", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
+                {id: 13, nombre: "nowell", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""},
+                {id: 14, nombre: "cesar", pj:0, g:0, e:0, p:0, gf:0, gc:0, gd:0, pts:0, img:""}
             ]
         };
 
@@ -1162,7 +1162,7 @@
                 year: "2025",
                 jugador: "Dani",
                 equipo: "Wolves",
-                escudo: "escudos/Wolverhampton_Wanderers.svg.webp",
+                escudo: "",
                 subcampeon: "Robert",
                 resultado: "3 - 2"
             }
@@ -1685,7 +1685,13 @@
             let memoriaHistorial = localStorage.getItem('superligaa_historialCampeones');
 
             if(memoriaHistorial) listaHistorialCampeones = JSON.parse(memoriaHistorial);
-            if(memoriaDatos) datosTorneo = JSON.parse(memoriaDatos);
+            
+            // Si hay datos previos guardados en LocalStorage, se usan. Si no, arranca con la estructura de jugadores corregida.
+            if(memoriaDatos) {
+                datosTorneo = JSON.parse(memoriaDatos);
+            } else {
+                datosTorneo = JSON.parse(JSON.stringify(estructuraLimpia));
+            }
             if(memoriaImagenes) imagenesBrackets = JSON.parse(memoriaImagenes);
 
             renderizarTablas();
