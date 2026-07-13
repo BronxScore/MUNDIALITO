@@ -1250,26 +1250,32 @@
             });
         }
 
-        function actualizarCampo(input, grupo, id, campo) {
+function actualizarCampo(input, grupo, id, campo) {
             let valor = input.value;
             let jugador = datosTorneo[grupo].find(j => j.id === id);
             if(!jugador) return;
             
             if (campo === 'nombre') {
                 jugador.nombre = valor;
-                function actualizarEtiquetasCalendario() {
+                actualizarEtiquetasCalendario();
+                const wrapperEstrellas = document.getElementById(`estrellas-j-${id}`);
+                if(wrapperEstrellas) wrapperEstrellas.innerHTML = obtenerEstrellasJugador(valor);
+            }
+            persistirEnLocalStorage();
+        }
+
+        function actualizarEtiquetasCalendario() {
             ['A', 'B'].forEach(grupo => {
                 const lista = datosTorneo[grupo];
                 
-                // Mapeo oficial de enfrentamientos para 7 jugadores (Todos contra todos + 1 descansa)
                 const cruces = {
-                    1: [[0,1], [2,3], [4,5]], // Descansa el jugador 6 (Robert / Cesar)
-                    2: [[0,2], [1,4], [3,6]], // Descansa el jugador 5 (Gabo / Nowell)
-                    3: [[0,3], [1,5], [2,6]], // Descansa el jugador 4 (Bronx / Oscar)
-                    4: [[0,4], [2,5], [1,6]], // Descansa el jugador 3 (Fran / Joel)
-                    5: [[0,5], [3,4], [1,2]], // Descansa el jugador 6 (Modificado para evitar repetir con el 5)
-                    6: [[1,2], [3,5], [0,6]], // Descansa el jugador 4
-                    7: [[1,3], [2,4], [0,5]]  // Descansa el jugador 6
+                    1: [[0,1], [2,3], [4,5]], 
+                    2: [[0,2], [1,4], [3,6]], 
+                    3: [[0,3], [1,5], [2,6]], 
+                    4: [[0,4], [2,5], [1,6]], 
+                    5: [[0,5], [3,4], [1,2]], 
+                    6: [[1,2], [3,5], [0,6]], 
+                    7: [[1,3], [2,4], [0,5]] 
                 };
 
                 for(let j = 1; j <= 7; j++) {
@@ -1283,7 +1289,6 @@
                         let localNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-l-name`);
                         let visitNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-v-name`);
                         
-                        // Si no hay jugador asignado en esa posición del cruce, significa que descansa
                         if(localNameEl) localNameEl.innerText = jugadorL ? jugadorL.nombre : "DESCANSA";
                         if(visitNameEl) visitNameEl.innerText = jugadorV ? jugadorV.nombre : "DESCANSA";
 
