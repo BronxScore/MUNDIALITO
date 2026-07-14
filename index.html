@@ -1146,19 +1146,6 @@
             ]
         };
 
-        // MATRIZ ESTÁTICA MATEMÁTICA FIJA (ROUND ROBIN PERFECTO DE 7 PARTICIPANTES)
-        // Mapea los índices relativos estáticos (del 0 al 6) basados en el orden de ID inicial
-        const MATRIZ_JORNADAS = {
-            1: { partidos: [[0, 5], [1, 4], [2, 3]], descanso: 6 },
-            2: { partidos: [[6, 4], [0, 3], [1, 2]], descanso: 5 },
-            3: { partidos: [[5, 3], [6, 2], [0, 1]], descanso: 4 },
-            4: { partidos: [[4, 2], [5, 1], [6, 0]], descanso: 3 },
-            5: { partidos: [[3, 1], [4, 0], [5, 6]], descanso: 2 },
-            6: { partidos: [[2, 0], [3, 6], [4, 5]], descanso: 1 },
-            7: { partidos: [[1, 6], [2, 5], [3, 4]], descanso: 0 }
-            // Si en un futuro necesitas expandir a la 8, 9 o 10 por errores o revanchas, solo añades los mapeos aquí de forma manual.
-        };
-
         let datosTorneo = JSON.parse(JSON.stringify(estructuraLimpia));
 
         let imagenesBrackets = {
@@ -1283,7 +1270,6 @@
                 if (!contenedor) return;
                 contenedor.innerHTML = "";
 
-                // Generamos las 7 jornadas basándonos exclusivamente en nuestra Matriz Estática Estructurada
                 for (let j = 1; j <= 7; j++) {
                     const bloqueJornada = document.createElement('div');
                     bloqueJornada.className = 'jornada-block';
@@ -1330,30 +1316,32 @@
             recuperarScoresCalendario();
         }
 
-        function obtenerJugadoresEstaticosPorID(grupo) {
-            // Esta función recupera los jugadores del almacenamiento en su orden original absoluto por ID
-            // de modo que no importa el ordenamiento visual por puntos de la tabla, el mapa de jornadas siempre de en el blanco.
-            const idBase = grupo === 'A' ? 1 : 8;
-            const listaOrdenadaId = [];
-            for (let i = 0; i < 7; i++) {
-                const idBuscado = idBase + i;
-                // Buscamos en el estado actual de datosTorneo de forma independiente a la posición del array
-                let jugadorEncontrado = datosTorneo[grupo].find(j => j.id === idBuscado);
-                listaOrdenadaId.push(jugadorEncontrado);
-            }
-            return listaOrdenadaId;
-        }
-
         function actualizarEtiquetasCalendario() {
             ['A', 'B'].forEach(grupo => {
-                const jugadoresIdFijo = obtenerJugadoresEstaticosPorID(grupo);
+                const idBase = grupo === 'A' ? 1 : 8;
+                const jugadores = [];
+                
+                // Mapeamos los 7 jugadores en un array ordenado (0 al 6) basado en su ID original
+                for (let i = 0; i < 7; i++) {
+                    const idBuscado = idBase + i;
+                    jugadores.push(datosTorneo[grupo].find(j => j.id === idBuscado));
+                }
 
+                // ALGORITMO ROUND ROBIN DINÁMICO PERFECTO PARA 7 JUGADORES
                 for (let j = 1; j <= 7; j++) {
-                    const configuracionJornada = MATRIZ_JORNADAS[j];
-                    if (!configuracionJornada) continue;
+                    let partidosJornada = [];
+                    let idxDescanso = (j - 1) % 7; 
+                    let jugadorLibre = jugadores[idxDescanso];
 
-                    let idxDescanso = configuracionJornada.descanso;
-                    let jugadorLibre = jugadoresIdFijo[idxDescanso];
+                    let activos = [];
+                    for (let k = 0; k < 7; k++) {
+                        if (k !== idxDescanso) activos.push(k);
+                    }
+
+                    // Emparejamiento perfecto balanceado
+                    partidosJornada.push([activos[0], activos[5]]);
+                    partidosJornada.push([activos[1], activos[4]]);
+                    partidosJornada.push([activos[2], activos[3]]);
 
                     let descansoEl = document.getElementById(`descanso-${grupo}-j${j}`);
                     if (descansoEl) {
@@ -1361,12 +1349,11 @@
                     }
 
                     for (let m = 1; m <= 3; m++) {
-                        let parMatches = configuracionJornada.partidos[m - 1];
-                        let idxL = parMatches[0];
-                        let idxV = parMatches[1];
+                        let idxL = partidosJornada[m - 1][0];
+                        let idxV = partidosJornada[m - 1][1];
                         
-                        let jugadorL = jugadoresIdFijo[idxL];
-                        let jugadorV = jugadoresIdFijo[idxV];
+                        let jugadorL = jugadores[idxL];
+                        let jugadorV = jugadores[idxV];
 
                         let localNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-l-name`);
                         let visitNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-v-name`);
@@ -1437,12 +1424,26 @@
                     j.pj = 0; j.g = 0; j.e = 0; j.p = 0; j.gf = 0; j.gc = 0; j.gd = 0; j.pts = 0;
                 });
 
-                const jugadoresIdFijo = obtenerJugadoresEstaticosPorID(grupo);
+                const idBase = grupo === 'A' ? 1 : 8;
+                const jugadores = [];
+                for (let i = 0; i < 7; i++) {
+                    const idBuscado = idBase + i;
+                    jugadores.push(datosTorneo[grupo].find(j => j.id === idBuscado));
+                }
 
-                // Procesamiento matemático puro y exacto desde el mapeado de la Matriz Fija
+                // Cálculo exacto usando el mismo algoritmo dinámico Round Robin
                 for (let j = 1; j <= 7; j++) {
-                    const configuracionJornada = MATRIZ_JORNADAS[j];
-                    if(!configuracionJornada) continue;
+                    let idxDescanso = (j - 1) % 7;
+                    let activos = [];
+                    for (let k = 0; k < 7; k++) {
+                        if (k !== idxDescanso) activos.push(k);
+                    }
+
+                    let partidosJornada = [
+                        [activos[0], activos[5]],
+                        [activos[1], activos[4]],
+                        [activos[2], activos[3]]
+                    ];
 
                     for (let m = 1; m <= 3; m++) {
                         let idL = `input-${grupo}-j${j}-m${m}-l`;
@@ -1455,12 +1456,11 @@
                             let golesL = parseInt(valL);
                             let golesV = parseInt(valV);
 
-                            let parMatches = configuracionJornada.partidos[m - 1];
-                            let idxL = parMatches[0];
-                            let idxV = parMatches[1];
+                            let idxL = partidosJornada[m - 1][0];
+                            let idxV = partidosJornada[m - 1][1];
 
-                            let jugadorL = jugadoresIdFijo[idxL];
-                            let jugadorV = jugadoresIdFijo[idxV];
+                            let jugadorL = jugadores[idxL];
+                            let jugadorV = jugadores[idxV];
 
                             if (jugadorL && jugadorV) {
                                 jugadorL.pj++;
@@ -1491,7 +1491,7 @@
                     }
                 }
 
-                // Ordenación justa y fija para renderizar la tabla de posiciones por mérito
+                // Ordenación justa y fija
                 datosTorneo[grupo].sort((a, b) => {
                     if (b.pts !== a.pts) return b.pts - a.pts;
                     if (b.gd !== a.gd) return b.gd - a.gd;
@@ -1504,7 +1504,6 @@
             renderizarTablas();
             actualizarEtiquetasCalendario();
 
-            // Configuración dinámica del Bracket recogiendo los 4 primeros ordenados de cada tabla
             configurarCeldaBracket('c1-t1', datosTorneo['A'][0]);
             configurarCeldaBracket('c1-t2', datosTorneo['B'][3]);
             configurarCeldaBracket('c2-t1', datosTorneo['B'][1]);
@@ -1515,7 +1514,7 @@
             configurarCeldaBracket('c4-t2', datosTorneo['B'][2]);
 
             persistirEnLocalStorage();
-            alert("¡Tablas calculadas y actualizadas automáticamente desde las jornadas fijas con éxito!");
+            alert("¡Tablas calculadas y actualizadas automáticamente desde las jornadas con éxito!");
             calcularBrackets();
         }
 
