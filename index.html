@@ -1122,86 +1122,94 @@
     </div>
 
    <script>
-        const CLAVE_SECRETA = "Nell69";
+        const CLAVE_SECRETA = "cristiano";
         let isAdmin = false;
 
         // MAPA ESTÁTICO MANUAL: Aquí modificas los emparejamientos cambiando los IDs de los jugadores
         const MAPA_JORNADAS_ESTATICO = {
-            A: {
-                "Jornada 1": [
-                    { localId: 1, visitanteId: 6 }, // Dani vs Gabo
-                    { localId: 2, visitanteId: 5 }, // Adrian vs Bronx
-                    { localId: 3, visitanteId: 4 }  // Maxi vs Fran
-                ],
-                "Jornada 2": [
-                    { localId: 7, visitanteId: 3 }, // Robert vs Maxi
-                    { localId: 1, visitanteId: 2 }, // Dani vs Adrian
-                    { localId: 6, visitanteId: 5 }  // Gabo vs Bronx
-                ],
-                "Jornada 3": [
-                    { localId: 4, visitanteId: 7 },
-                    { localId: 3, visitanteId: 1 },
-                    { localId: 2, visitanteId: 6 }
-                ],
-                "Jornada 4": [
-                    { localId: 5, visitanteId: 4 },
-                    { localId: 7, visitanteId: 3 },
-                    { localId: 1, visitanteId: 6 }
-                ],
-                "Jornada 5": [
-                    { localId: 2, visitanteId: 7 },
-                    { localId: 6, visitanteId: 4 },
-                    { localId: 5, visitanteId: 3 }
-                ],
-                "Jornada 6": [
-                    { localId: 1, visitanteId: 5 },
-                    { localId: 3, visitanteId: 2 },
-                    { localId: 4, visitanteId: 7 }
-                ],
-                "Jornada 7": [
-                    { localId: 6, visitanteId: 3 },
-                    { localId: 5, visitanteId: 2 },
-                    { localId: 7, visitanteId: 1 }
-                ]
-            },
-            B: {
-                "Jornada 1": [
-                    { localId: 8, visitanteId: 13 }, // Minibronx vs Nowell
-                    { localId: 9, visitanteId: 12 }, // Brayham vs Oscar
-                    { localId: 10, visitanteId: 11 } // Henryto vs Joel
-                ],
-                "Jornada 2": [
-                    { localId: 14, visitanteId: 10 }, // Cesar vs Henryto
-                    { localId: 8, visitanteId: 9 },   // Minibronx vs Brayham
-                    { localId: 13, visitanteId: 12 }  // Nowell vs Oscar
-                ],
-                "Jornada 3": [
-                    { localId: 11, visitanteId: 14 },
-                    { localId: 10, visitanteId: 8 },
-                    { localId: 9, visitanteId: 13 }
-                ],
-                "Jornada 4": [
-                    { localId: 12, visitanteId: 11 },
-                    { localId: 14, visitanteId: 10 },
-                    { localId: 8, visitanteId: 13 }
-                ],
-                "Jornada 5": [
-                    { localId: 9, visitanteId: 14 },
-                    { localId: 13, visitanteId: 11 },
-                    { localId: 12, visitanteId: 10 }
-                ],
-                "Jornada 6": [
-                    { localId: 8, visitanteId: 12 },
-                    { localId: 10, visitanteId: 9 },
-                    { localId: 11, visitanteId: 14 }
-                ],
-                "Jornada 7": [
-                    { localId: 13, visitanteId: 10 },
-                    { localId: 12, visitanteId: 9 },
-                    { localId: 14, visitanteId: 8 }
-                ]
-            }
-        };
+    A: {
+        "Jornada 1": [
+            { localId: 1, visitanteId: 6 },
+            { localId: 2, visitanteId: 5 },
+            { localId: 3, visitanteId: 4 }
+        ], // Descansa: 7 (Robert)
+        "Jornada 2": [
+            { localId: 7, visitanteId: 5 },
+            { localId: 1, visitanteId: 4 },
+            { localId: 2, visitanteId: 3 }
+        ], // Descansa: 6 (Gabo)
+        "Jornada 3": [
+            { localId: 6, visitanteId: 4 },
+            { localId: 7, visitanteId: 3 },
+            { localId: 1, visitanteId: 2 }
+        ], // Descansa: 5 (Bronx)
+        "Jornada 4": [
+            { localId: 5, visitanteId: 3 },
+            { localId: 6, visitanteId: 2 },
+            { localId: 7, visitanteId: 1 }
+        ], // Descansa: 4 (Fran)
+        "Jornada 5": [
+            { localId: 4, visitanteId: 2 },
+            { localId: 5, visitanteId: 1 },
+            { localId: 6, visitanteId: 7 }
+        ], // Descansa: 3 (Maxi)
+        "Jornada 6": [
+            { localId: 3, visitanteId: 1 },
+            { localId: 4, visitanteId: 7 },
+            { localId: 5, visitanteId: 6 }
+        ], // Descansa: 2 (Adrian)
+        "Jornada 7": [
+            { localId: 2, visitanteId: 7 },
+            { localId: 3, visitanteId: 6 },
+            { localId: 4, visitanteId: 5 }
+        ]  // Descansa: 1 (Dani)
+    },
+    B: {
+        "Jornada 1": [
+            { localId: 8, visitanteId: 13 },
+            { localId: 9, visitanteId: 12 },
+            { localId: 10, visitanteId: 11 }
+        ], // Descansa: 14 (Cesar)
+        "Jornada 2": [
+            { localId: 14, visitanteId: 12 },
+            { localId: 8, visitanteId: 11 },
+            { localId: 9, visitanteId: 10 }
+        ], // Descansa: 13 (Nowell)
+        "Jornada 3": [
+            { localId: 13, visitanteId: 11 },
+            { localId: 14, visitanteId: 10 },
+            { localId: 8, visitanteId: 9 }
+        ], // Descansa: 12 (Oscar)
+        "Jornada 4": [
+            { localId: 12, visitanteId: 10 },
+            { localId: 13, visitanteId: 9 },
+            { localId: 14, visitanteId: 8 }
+        ], // Descansa: 11 (Joel)
+        "Jornada 5": [
+            { localId: 11, visitanteId: 9 },
+            { localId: 12, visitanteId: 8 },
+            { localId: 13, visitanteId: 14 }
+        ], // Descansa: 10 (Henryto)
+        "Jornada 6": [
+            { localId: 10, visitanteId: 8 },
+            { localId: 11, visitanteId: 14 },
+            { localId: 12, visitanteId: 13 }
+        ], // Descansa: 9 (Brayham)
+        "Jornada 7": [
+            { localId: 8, visitanteId: 9 }, // Corrección interna para cerrar ciclo
+            { localId: 9, visitanteId: 14 },
+            { localId: 10, visitanteId: 13 },
+            { localId: 11, visitanteId: 12 }
+        ].filter(e => e.localId !== 8 || e.visitanteId !== 9) // Ajuste automático para limpiar el sobrante y dejar descansar al 8
+    }
+};
+
+// Corrección manual limpia para la última jornada del Grupo B (Descansa ID 8 - Minibronx)
+MAPA_JORNADAS_ESTATICO.B["Jornada 7"] = [
+    { localId: 9, visitanteId: 14 },
+    { localId: 10, visitanteId: 13 },
+    { localId: 11, visitanteId: 12 }
+];
 
         const estructuraLimpia = {
             A: [
