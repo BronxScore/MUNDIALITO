@@ -1146,17 +1146,18 @@
             ]
         };
 
-        // Fixtures Round Robin perfectos estáticos de 7 jornadas (3 partidos + 1 descanso por jornada)
-        // Valores mapean las posiciones originales de los arrays (0 a 6)
-        const fixtureEstatico = [
-            { j: 1, partidos: [[1, 6], [2, 5], [3, 4]], descansa: 0 }, // Adrian-Robert, Maxi-Gabo, Fran-Bronx | Descansa Dani
-            { j: 2, partidos: [[0, 6], [1, 5], [2, 3]], descansa: 4 }, // Dani-Robert, Adrian-Gabo, Maxi-Fran | Descansa Bronx
-            { j: 3, partidos: [[0, 5], [6, 3], [1, 4]], descansa: 2 }, // Dani-Gabo, Robert-Fran, Adrian-Bronx | Descansa Maxi
-            { j: 4, partidos: [[0, 3], [5, 4], [6, 2]], descansa: 1 }, // Dani-Fran, Gabo-Bronx, Robert-Maxi | Descansa Adrian
-            { j: 5, partidos: [[0, 4], [3, 2], [5, 1]], descansa: 6 }, // Dani-Bronx, Fran-Maxi, Gabo-Adrian | Descansa Robert
-            { j: 6, partidos: [[0, 2], [4, 1], [3, 6]], descansa: 5 }, // Dani-Maxi, Bronx-Adrian, Fran-Robert | Descansa Gabo
-            { j: 7, partidos: [[0, 1], [2, 6], [5, 4]], descansa: 3 }  // Dani-Adrian, Maxi-Robert, Gabo-Bronx | Descansa Fran
-        ];
+        // MATRIZ ESTÁTICA MATEMÁTICA FIJA (ROUND ROBIN PERFECTO DE 7 PARTICIPANTES)
+        // Mapea los índices relativos estáticos (del 0 al 6) basados en el orden de ID inicial
+        const MATRIZ_JORNADAS = {
+            1: { partidos: [[0, 5], [1, 4], [2, 3]], descanso: 6 },
+            2: { partidos: [[6, 4], [0, 3], [1, 2]], descanso: 5 },
+            3: { partidos: [[5, 3], [6, 2], [0, 1]], descanso: 4 },
+            4: { partidos: [[4, 2], [5, 1], [6, 0]], descanso: 3 },
+            5: { partidos: [[3, 1], [4, 0], [5, 6]], descanso: 2 },
+            6: { partidos: [[2, 0], [3, 6], [4, 5]], descanso: 1 },
+            7: { partidos: [[1, 6], [2, 5], [3, 4]], descanso: 0 }
+            // Si en un futuro necesitas expandir a la 8, 9 o 10 por errores o revanchas, solo añades los mapeos aquí de forma manual.
+        };
 
         let datosTorneo = JSON.parse(JSON.stringify(estructuraLimpia));
 
@@ -1282,6 +1283,7 @@
                 if (!contenedor) return;
                 contenedor.innerHTML = "";
 
+                // Generamos las 7 jornadas basándonos exclusivamente en nuestra Matriz Estática Estructurada
                 for (let j = 1; j <= 7; j++) {
                     const bloqueJornada = document.createElement('div');
                     bloqueJornada.className = 'jornada-block';
@@ -1328,24 +1330,30 @@
             recuperarScoresCalendario();
         }
 
+        function obtenerJugadoresEstaticosPorID(grupo) {
+            // Esta función recupera los jugadores del almacenamiento en su orden original absoluto por ID
+            // de modo que no importa el ordenamiento visual por puntos de la tabla, el mapa de jornadas siempre de en el blanco.
+            const idBase = grupo === 'A' ? 1 : 8;
+            const listaOrdenadaId = [];
+            for (let i = 0; i < 7; i++) {
+                const idBuscado = idBase + i;
+                // Buscamos en el estado actual de datosTorneo de forma independiente a la posición del array
+                let jugadorEncontrado = datosTorneo[grupo].find(j => j.id === idBuscado);
+                listaOrdenadaId.push(jugadorEncontrado);
+            }
+            return listaOrdenadaId;
+        }
+
         function actualizarEtiquetasCalendario() {
             ['A', 'B'].forEach(grupo => {
-                const idBase = grupo === 'A' ? 1 : 8;
-                const jugadores = [];
-                
-                // Mapeo estable por orden de id original
-                for (let i = 0; i < 7; i++) {
-                    const idBuscado = idBase + i;
-                    // Buscamos siempre en la estructura limpia/inicial para que el orden del fixture no varíe al ordenar la tabla
-                    jugadores.push(estructuraLimpia[grupo].find(j => j.id === idBuscado));
-                }
+                const jugadoresIdFijo = obtenerJugadoresEstaticosPorID(grupo);
 
-                // Ajustar nombres e imágenes dinámicamente según lo que tenga cargado datosTorneo actualmente
-                const jugadoresActuales = jugadores.map(j => datosTorneo[grupo].find(act => act.id === j.id));
+                for (let j = 1; j <= 7; j++) {
+                    const configuracionJornada = MATRIZ_JORNADAS[j];
+                    if (!configuracionJornada) continue;
 
-                fixtureEstatico.forEach(config => {
-                    let j = config.j;
-                    let jugadorLibre = jugadoresActuales[config.descansa];
+                    let idxDescanso = configuracionJornada.descanso;
+                    let jugadorLibre = jugadoresIdFijo[idxDescanso];
 
                     let descansoEl = document.getElementById(`descanso-${grupo}-j${j}`);
                     if (descansoEl) {
@@ -1353,11 +1361,12 @@
                     }
 
                     for (let m = 1; m <= 3; m++) {
-                        let idxL = config.partidos[m - 1][0];
-                        let idxV = config.partidos[m - 1][1];
+                        let parMatches = configuracionJornada.partidos[m - 1];
+                        let idxL = parMatches[0];
+                        let idxV = parMatches[1];
                         
-                        let jugadorL = jugadoresActuales[idxL];
-                        let jugadorV = jugadoresActuales[idxV];
+                        let jugadorL = jugadoresIdFijo[idxL];
+                        let jugadorV = jugadoresIdFijo[idxV];
 
                         let localNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-l-name`);
                         let visitNameEl = document.getElementById(`text-${grupo}-jj${j}-m${m}-v-name`);
@@ -1375,7 +1384,7 @@
                             visitImgContainer.innerHTML = (jugadorV && jugadorV.img) ? `<img src="${jugadorV.img}">` : `<i class="fa-solid fa-flag"></i>`;
                         }
                     }
-                });
+                }
             });
         }
 
@@ -1428,18 +1437,13 @@
                     j.pj = 0; j.g = 0; j.e = 0; j.p = 0; j.gf = 0; j.gc = 0; j.gd = 0; j.pts = 0;
                 });
 
-                const idBase = grupo === 'A' ? 1 : 8;
-                const jugadores = [];
-                for (let i = 0; i < 7; i++) {
-                    const idBuscado = idBase + i;
-                    jugadores.push(estructuraLimpia[grupo].find(j => j.id === idBuscado));
-                }
+                const jugadoresIdFijo = obtenerJugadoresEstaticosPorID(grupo);
 
-                const jugadoresActuales = jugadores.map(j => datosTorneo[grupo].find(act => act.id === j.id));
+                // Procesamiento matemático puro y exacto desde el mapeado de la Matriz Fija
+                for (let j = 1; j <= 7; j++) {
+                    const configuracionJornada = MATRIZ_JORNADAS[j];
+                    if(!configuracionJornada) continue;
 
-                // Cálculo exacto usando la matriz Round Robin fija sin repeticiones
-                fixtureEstatico.forEach(config => {
-                    let j = config.j;
                     for (let m = 1; m <= 3; m++) {
                         let idL = `input-${grupo}-j${j}-m${m}-l`;
                         let idV = `input-${grupo}-j${j}-m${m}-v`;
@@ -1451,11 +1455,12 @@
                             let golesL = parseInt(valL);
                             let golesV = parseInt(valV);
 
-                            let idxL = config.partidos[m - 1][0];
-                            let idxV = config.partidos[m - 1][1];
+                            let parMatches = configuracionJornada.partidos[m - 1];
+                            let idxL = parMatches[0];
+                            let idxV = parMatches[1];
 
-                            let jugadorL = jugadoresActuales[idxL];
-                            let jugadorV = jugadoresActuales[idxV];
+                            let jugadorL = jugadoresIdFijo[idxL];
+                            let jugadorV = jugadoresIdFijo[idxV];
 
                             if (jugadorL && jugadorV) {
                                 jugadorL.pj++;
@@ -1484,9 +1489,9 @@
                             }
                         }
                     }
-                });
+                }
 
-                // Ordenación justa por puntos, GD y GF
+                // Ordenación justa y fija para renderizar la tabla de posiciones por mérito
                 datosTorneo[grupo].sort((a, b) => {
                     if (b.pts !== a.pts) return b.pts - a.pts;
                     if (b.gd !== a.gd) return b.gd - a.gd;
@@ -1499,6 +1504,7 @@
             renderizarTablas();
             actualizarEtiquetasCalendario();
 
+            // Configuración dinámica del Bracket recogiendo los 4 primeros ordenados de cada tabla
             configurarCeldaBracket('c1-t1', datosTorneo['A'][0]);
             configurarCeldaBracket('c1-t2', datosTorneo['B'][3]);
             configurarCeldaBracket('c2-t1', datosTorneo['B'][1]);
@@ -1509,7 +1515,7 @@
             configurarCeldaBracket('c4-t2', datosTorneo['B'][2]);
 
             persistirEnLocalStorage();
-            alert("¡Tablas calculadas y actualizadas automáticamente desde las jornadas con éxito!");
+            alert("¡Tablas calculadas y actualizadas automáticamente desde las jornadas fijas con éxito!");
             calcularBrackets();
         }
 
