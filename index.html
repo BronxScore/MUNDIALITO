@@ -1177,7 +1177,7 @@
         };
 
         let datosTorneo = JSON.parse(JSON.stringify(estructuraLimpia));
-        let resultadosJornadas = {}; // NUEVO: Guardará de forma global en Supabase todos los goles
+        let resultadosJornadas = {}; 
         let imagenesBrackets = {
             "c1-t1": "", "c1-t2": "", "c2-t1": "", "c2-t2": "",
             "c3-t1": "", "c3-t2": "", "c4-t1": "", "c4-t2": "",
@@ -1188,9 +1188,6 @@
             { id: 1, year: "2025", jugador: "Dani", equipo: "Wolves", escudo: "escudos/wolves.png", subcampeon: "Robert", resultado: "3 - 2" }
         ];
 
-        // ==========================================
-        // FUNCIONES DE PERSISTENCIA (SINCRO TOTAL DE NUBE)
-        // ==========================================
         async function persistirDatos() {
             localStorage.setItem('superligaa_datosTorneo', JSON.stringify(datosTorneo));
             localStorage.setItem('superligaa_imagenesBrackets', JSON.stringify(imagenesBrackets));
@@ -1206,7 +1203,7 @@
                             datos: datosTorneo, 
                             brackets: imagenesBrackets,
                             historial: listaHistorialCampeones,
-                            resultados_jornadas: resultadosJornadas, // Se sube la nube
+                            resultados_jornadas: resultadosJornadas, 
                             updated_at: new Date() 
                         });
                 } catch (e) {
@@ -1238,15 +1235,21 @@
                         if(data.datos) datosTorneo = data.datos;
                         if(data.brackets) imagenesBrackets = data.brackets;
                         if(data.historial) listaHistorialCampeones = data.historial;
-                        if(data.resultados_jornadas) resultadosJornadas = data.resultados_jornadas; // Descarga de la nube
+                        if(data.resultados_jornadas) resultadosJornadas = data.resultados_jornadas; 
                     }
                 } catch (e) {
                     console.error("Usando caché local.");
                 }
             }
 
-            renderizarTablas();
+            // CORRECCIÓN DE ORDEN: Primero generamos la estructura visual del HTML
             generarCalendariosHTML();
+            renderizarTablas();
+            
+            // Luego forzamos a recuperar los scores e inyectar etiquetas de texto de forma segura
+            recuperarScoresCalendario();
+            actualizarEtiquetasCalendario();
+            
             recuperarInputsYLabelsBrackets();
             calcularBrackets();
             renderizarHistorialCampeones();
@@ -1392,8 +1395,6 @@
                     contenedor.appendChild(bloqueJornada);
                 });
             });
-            actualizarEtiquetasCalendario();
-            recuperarScoresCalendario();
         }
 
         function actualizarEtiquetasCalendario() {
@@ -1432,7 +1433,7 @@
         function guardarScoreCalendario(idInput) {
             let el = document.getElementById(idInput);
             if(el) {
-                resultadosJornadas[idInput] = el.value; // Guardado unificado global
+                resultadosJornadas[idInput] = el.value; 
                 persistirDatos();
             }
         }
