@@ -846,18 +846,55 @@
             .btn-guardar { width: 100%; }
             .bracket-wrapper { grid-template-columns: 1fr; gap: 30px; }
             
-            /* Ajuste crítico de visualización en teléfonos */
+            /* Ajuste crítico de visualización en teléfonos (Corregido) */
             .fixture-match-row { 
+                display: flex;
                 flex-direction: row; 
                 justify-content: space-between;
                 align-items: center;
-                gap: 4px; 
+                gap: 8px; 
                 padding: 12px 8px; 
             }
-            .fixture-team { width: 35%; flex-grow: 1; }
-            .fixture-team span { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .fixture-team.team-local { flex-direction: row; justify-content: flex-end; text-align: right; }
-            .fixture-team.team-visitante { flex-direction: row; justify-content: flex-start; text-align: left; }
+            .fixture-team { 
+                width: 40%; 
+                display: flex; 
+                align-items: center; 
+                gap: 8px;
+            }
+            .fixture-team span { 
+                font-size: 11px; 
+                white-space: nowrap; 
+                overflow: hidden; 
+                text-overflow: ellipsis; 
+            }
+            
+            /* Mantiene el orden de "Texto - Bandera" en el local */
+            .fixture-team.team-local { 
+                flex-direction: row; 
+                justify-content: flex-end; 
+                text-align: right; 
+            }
+            /* Mantiene el orden de "Bandera - Texto" en el visitante */
+            .fixture-team.team-visitante { 
+                flex-direction: row; 
+                justify-content: flex-start; 
+                text-align: left; 
+            }
+            
+            /* Evita que los brackets de eliminación sufran desajustes de flexbox en responsive */
+            .match-team-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+            }
+            .match-team-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                width: auto;
+            }
+            
             .fixture-score-inputs { flex-shrink: 0; padding: 4px; }
             
             .header-historial { flex-direction: column; gap: 12px; align-items: flex-start; }
